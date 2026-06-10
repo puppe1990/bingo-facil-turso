@@ -18,6 +18,7 @@ import { Route as AuthenticatedCreateRouteImport } from './app/_authenticated/cr
 import { Route as AuthenticatedConfigRouteImport } from './app/_authenticated/config'
 import { Route as ApiAuthSplatRouteImport } from './app/api/auth/$'
 import { Route as AuthenticatedEventEventIdRouteImport } from './app/_authenticated/event/$eventId'
+import { Route as AuthenticatedEventEventIdIndexRouteImport } from './app/_authenticated/event/$eventId/index'
 import { Route as AuthenticatedEventEventIdLiveRouteImport } from './app/_authenticated/event/$eventId/live'
 
 const SignupRoute = SignupRouteImport.update({
@@ -65,6 +66,12 @@ const AuthenticatedEventEventIdRoute =
     path: '/event/$eventId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedEventEventIdIndexRoute =
+  AuthenticatedEventEventIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedEventEventIdRoute,
+  } as any)
 const AuthenticatedEventEventIdLiveRoute =
   AuthenticatedEventEventIdLiveRouteImport.update({
     id: '/live',
@@ -82,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/event/$eventId': typeof AuthenticatedEventEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/event/$eventId/live': typeof AuthenticatedEventEventIdLiveRoute
+  '/event/$eventId/': typeof AuthenticatedEventEventIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -90,9 +98,9 @@ export interface FileRoutesByTo {
   '/create': typeof AuthenticatedCreateRoute
   '/vendas': typeof AuthenticatedVendasRoute
   '/': typeof AuthenticatedIndexRoute
-  '/event/$eventId': typeof AuthenticatedEventEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/event/$eventId/live': typeof AuthenticatedEventEventIdLiveRoute
+  '/event/$eventId': typeof AuthenticatedEventEventIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_authenticated/event/$eventId': typeof AuthenticatedEventEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/event/$eventId/live': typeof AuthenticatedEventEventIdLiveRoute
+  '/_authenticated/event/$eventId/': typeof AuthenticatedEventEventIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/event/$eventId'
     | '/api/auth/$'
     | '/event/$eventId/live'
+    | '/event/$eventId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -127,9 +137,9 @@ export interface FileRouteTypes {
     | '/create'
     | '/vendas'
     | '/'
-    | '/event/$eventId'
     | '/api/auth/$'
     | '/event/$eventId/live'
+    | '/event/$eventId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/_authenticated/event/$eventId'
     | '/api/auth/$'
     | '/_authenticated/event/$eventId/live'
+    | '/_authenticated/event/$eventId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -216,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventEventIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/event/$eventId/': {
+      id: '/_authenticated/event/$eventId/'
+      path: '/'
+      fullPath: '/event/$eventId/'
+      preLoaderRoute: typeof AuthenticatedEventEventIdIndexRouteImport
+      parentRoute: typeof AuthenticatedEventEventIdRoute
+    }
     '/_authenticated/event/$eventId/live': {
       id: '/_authenticated/event/$eventId/live'
       path: '/live'
@@ -228,11 +246,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedEventEventIdRouteChildren {
   AuthenticatedEventEventIdLiveRoute: typeof AuthenticatedEventEventIdLiveRoute
+  AuthenticatedEventEventIdIndexRoute: typeof AuthenticatedEventEventIdIndexRoute
 }
 
 const AuthenticatedEventEventIdRouteChildren: AuthenticatedEventEventIdRouteChildren =
   {
     AuthenticatedEventEventIdLiveRoute: AuthenticatedEventEventIdLiveRoute,
+    AuthenticatedEventEventIdIndexRoute: AuthenticatedEventEventIdIndexRoute,
   }
 
 const AuthenticatedEventEventIdRouteWithChildren =

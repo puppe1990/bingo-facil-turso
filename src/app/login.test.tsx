@@ -7,7 +7,13 @@ import { useSession } from '@/src/lib/auth-client';
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@tanstack/react-router')>();
-  return { ...actual, useNavigate: vi.fn(), Link: ({ children, ...props }: { children: ReactNode; to: string }) => <a href={props.to}>{children}</a> };
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+    Link: ({ children, ...props }: { children: ReactNode; to: string }) => (
+      <a href={props.to}>{children}</a>
+    ),
+  };
 });
 
 vi.mock('@/src/lib/auth-client', () => ({

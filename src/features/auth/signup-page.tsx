@@ -47,8 +47,12 @@ export function SignupPage() {
               <div className="w-20 h-20 bg-amber-400 rounded-3xl flex items-center justify-center shadow-2xl mb-6">
                 <Ticket className="w-10 h-10 text-indigo-900" />
               </div>
-              <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">Criar Conta</h1>
-              <p className="text-indigo-300 font-bold uppercase tracking-[0.2em] text-[10px]">Bingo Fácil</p>
+              <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">
+                Criar Conta
+              </h1>
+              <p className="text-indigo-300 font-bold uppercase tracking-[0.2em] text-[10px]">
+                Bingo Fácil
+              </p>
             </div>
           </div>
 
@@ -61,7 +65,9 @@ export function SignupPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">Nome</label>
+                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">
+                  Nome
+                </label>
                 <input
                   type="text"
                   required
@@ -71,7 +77,9 @@ export function SignupPage() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">E-mail</label>
+                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">
+                  E-mail
+                </label>
                 <input
                   type="email"
                   required
@@ -81,7 +89,9 @@ export function SignupPage() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">Senha</label>
+                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">
+                  Senha
+                </label>
                 <input
                   type="password"
                   required

@@ -5,13 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port=3000 --host=0.0.0.0",
+    "dev:clean": "npm run clean && vite dev --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "start": "node dist/server/server.js",
     "preview": "vite preview",
-    "clean": "rm -rf dist .output",
+    "clean": "rm -rf dist .output node_modules/.vite .tanstack/tmp",
     "lint": "tsc --noEmit",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "test": "vitest run",
     "test:watch": "vitest",
+    "ci": "npm run format:check && npm run lint && npm test && npm run build",
+    "prepare": "husky",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -46,12 +51,20 @@
     "@vitest/ui": "^4.1.8",
     "autoprefixer": "^10.4.21",
     "drizzle-kit": "^0.31.10",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+    "lint-staged": "^16.2.7",
     "playwright": "^1.60.0",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^7.3.5",
     "vitest": "^4.1.8"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md,yml,yaml,mjs,css}": [
+      "prettier --write"
+    ]
   }
 }

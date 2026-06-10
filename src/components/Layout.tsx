@@ -52,7 +52,9 @@ export function Layout({ children }: { children?: ReactNode }) {
             Novo Bingo
           </Link>
 
-          <div className="pt-4 pb-2 px-3 text-[10px] font-black text-indigo-300 uppercase tracking-widest">Acesso Rápido</div>
+          <div className="pt-4 pb-2 px-3 text-[10px] font-black text-indigo-300 uppercase tracking-widest">
+            Acesso Rápido
+          </div>
           <Link
             to="/"
             className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
@@ -109,19 +111,31 @@ export function Layout({ children }: { children?: ReactNode }) {
       </aside>
 
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-indigo-800 border-t border-indigo-700 flex justify-around p-2 z-50">
-        <Link to="/" className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/') ? 'text-amber-400' : 'text-indigo-300'}`}>
+        <Link
+          to="/"
+          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/') ? 'text-amber-400' : 'text-indigo-300'}`}
+        >
           <LayoutDashboard className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase">Início</span>
         </Link>
-        <Link to="/create" className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/create') ? 'text-amber-400' : 'text-indigo-300'}`}>
+        <Link
+          to="/create"
+          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/create') ? 'text-amber-400' : 'text-indigo-300'}`}
+        >
           <PlusCircle className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase">Novo</span>
         </Link>
-        <Link to="/vendas" className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/vendas') ? 'text-amber-400' : 'text-indigo-300'}`}>
+        <Link
+          to="/vendas"
+          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/vendas') ? 'text-amber-400' : 'text-indigo-300'}`}
+        >
           <Users className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase">Vendas</span>
         </Link>
-        <Link to="/config" className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/config') ? 'text-amber-400' : 'text-indigo-300'}`}>
+        <Link
+          to="/config"
+          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${isActive('/config') ? 'text-amber-400' : 'text-indigo-300'}`}
+        >
           <Settings className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase">Ajustes</span>
         </Link>

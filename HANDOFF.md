@@ -19,16 +19,16 @@ Migrar o **Bingo Fácil** de Firebase (Auth + Firestore) para uma stack self-hos
 
 ### Stack atual
 
-| Camada | Tecnologia |
-|--------|------------|
-| Framework | React 19 + **TanStack Start** (SSR) + **TanStack Router** |
-| Build | Vite 7 |
-| Estilo | Tailwind CSS 4 |
-| Auth | **Better Auth** (email/senha) com adapter Drizzle SQLite |
-| Banco | **Turso/libSQL** via `@libsql/client` + **Drizzle ORM** |
-| Data layer | TanStack `createServerFn` (`src/server/*.functions.ts`) |
-| PDF | `pdf-lib` (exportação client-side) |
-| Testes | Vitest (17 testes) + Playwright browser E2E (manual, falhando) |
+| Camada     | Tecnologia                                                     |
+| ---------- | -------------------------------------------------------------- |
+| Framework  | React 19 + **TanStack Start** (SSR) + **TanStack Router**      |
+| Build      | Vite 7                                                         |
+| Estilo     | Tailwind CSS 4                                                 |
+| Auth       | **Better Auth** (email/senha) com adapter Drizzle SQLite       |
+| Banco      | **Turso/libSQL** via `@libsql/client` + **Drizzle ORM**        |
+| Data layer | TanStack `createServerFn` (`src/server/*.functions.ts`)        |
+| PDF        | `pdf-lib` (exportação client-side)                             |
+| Testes     | Vitest (17 testes) + Playwright browser E2E (manual, falhando) |
 
 ### Rotas
 
@@ -118,13 +118,13 @@ data/                       # SQLite local
 
 ### Verificações (2026-06-10)
 
-| Comando | Resultado |
-|---------|-----------|
-| `npm test` | ✅ 17/17 passando |
-| `npm run lint` | ✅ `tsc --noEmit` limpo |
-| `npm run build` | ✅ Build OK |
-| `npm start` | ❌ Caminho errado (`.output/` vs `dist/`) |
-| Browser E2E (`scripts/e2e-browser.mjs`) | ❌ Timeout na criação de evento |
+| Comando                                 | Resultado                                 |
+| --------------------------------------- | ----------------------------------------- |
+| `npm test`                              | ✅ 17/17 passando                         |
+| `npm run lint`                          | ✅ `tsc --noEmit` limpo                   |
+| `npm run build`                         | ✅ Build OK                               |
+| `npm start`                             | ❌ Caminho errado (`.output/` vs `dist/`) |
+| Browser E2E (`scripts/e2e-browser.mjs`) | ❌ Timeout na criação de evento           |
 
 ### Git
 
@@ -143,19 +143,19 @@ data/                       # SQLite local
 
 ### O que não funciona / está pendente
 
-| Item | Prioridade | Detalhe |
-|------|------------|---------|
-| `npm start` | Alta | Aponta para `.output/server/index.mjs`; build gera `dist/server/server.js` |
-| Browser E2E | Média | Timeout após "Gerar e Finalizar Evento" — provável issue com `fill()` em input controlado React (default 100 cartelas) ou erro silencioso no `createEventFn` |
-| Erros silenciosos na UI | Média | `CreateEvent.tsx` faz `catch` sem feedback visual |
-| Script de migração Firestore | Média | Não existe — dados antigos do Firebase não são importados |
-| README desatualizado | Baixa | Ainda referencia AI Studio / `GEMINI_API_KEY` |
-| Deps não usadas | Baixa | `@google-cloud/storage`, `@google/genai`, `express` |
-| `firestore.rules` | Baixa | Artefato legado no root |
-| Dual migration strategy | Baixa | Inline SQL em `index.ts` vs `drizzle-kit push` — sem pasta `migrations/` |
-| Realtime multi-device | Baixa | Live draw usa polling, não websockets |
-| Settings stubs | Baixa | Security, Notifications, Subscription são UI-only |
-| Limite de cartelas inconsistente | Baixa | Form `max="1000"`, Zod permite até `10000` |
+| Item                             | Prioridade | Detalhe                                                                                                                                                      |
+| -------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm start`                      | Alta       | Aponta para `.output/server/index.mjs`; build gera `dist/server/server.js`                                                                                   |
+| Browser E2E                      | Média      | Timeout após "Gerar e Finalizar Evento" — provável issue com `fill()` em input controlado React (default 100 cartelas) ou erro silencioso no `createEventFn` |
+| Erros silenciosos na UI          | Média      | `CreateEvent.tsx` faz `catch` sem feedback visual                                                                                                            |
+| Script de migração Firestore     | Média      | Não existe — dados antigos do Firebase não são importados                                                                                                    |
+| README desatualizado             | Baixa      | Ainda referencia AI Studio / `GEMINI_API_KEY`                                                                                                                |
+| Deps não usadas                  | Baixa      | `@google-cloud/storage`, `@google/genai`, `express`                                                                                                          |
+| `firestore.rules`                | Baixa      | Artefato legado no root                                                                                                                                      |
+| Dual migration strategy          | Baixa      | Inline SQL em `index.ts` vs `drizzle-kit push` — sem pasta `migrations/`                                                                                     |
+| Realtime multi-device            | Baixa      | Live draw usa polling, não websockets                                                                                                                        |
+| Settings stubs                   | Baixa      | Security, Notifications, Subscription são UI-only                                                                                                            |
+| Limite de cartelas inconsistente | Baixa      | Form `max="1000"`, Zod permite até `10000`                                                                                                                   |
 
 ---
 
@@ -168,22 +168,24 @@ cp .env.example .env          # preencher BETTER_AUTH_SECRET (32+ chars)
 npm run dev                   # http://localhost:3000
 ```
 
-| Comando | Propósito |
-|---------|-----------|
-| `npm run dev` | Dev server (porta 3000) |
-| `npm run build` | Build produção → `dist/` |
-| `npm test` | Vitest (17 testes) |
-| `npm run test:watch` | Vitest watch |
-| `npm run lint` | TypeScript check |
-| `npm run db:push` | Drizzle push (pode conflitar com inline migrations) |
+| Comando              | Propósito                                           |
+| -------------------- | --------------------------------------------------- |
+| `npm run dev`        | Dev server (porta 3000)                             |
+| `npm run build`      | Build produção → `dist/`                            |
+| `npm test`           | Vitest (17 testes)                                  |
+| `npm run test:watch` | Vitest watch                                        |
+| `npm run lint`       | TypeScript check                                    |
+| `npm run db:push`    | Drizzle push (pode conflitar com inline migrations) |
 
 **Produção (até corrigir `start`):**
+
 ```bash
 npm run build
 node dist/server/server.js
 ```
 
 **Browser E2E manual:**
+
 ```bash
 npm run dev -- --port 3020
 node scripts/e2e-browser.mjs
@@ -232,14 +234,14 @@ scripts/e2e-browser.mjs            # E2E Playwright — falhando
 
 ## 8. Artefatos da sessão
 
-| Artefato | Caminho |
-|----------|---------|
-| Sessão Grok | `~/.grok/sessions/%2FUsers%2Fmatheuspuppe%2FDesktop%2FProjetos%2Fbingo-facil/019eb2d3-4630-7fe0-9bb3-c0e3af5f8ad4/` |
-| Screenshot E2E failure | `e2e-failure.png` (project root) |
-| Este handoff | `HANDOFF.md` |
+| Artefato               | Caminho                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Sessão Grok            | `~/.grok/sessions/%2FUsers%2Fmatheuspuppe%2FDesktop%2FProjetos%2Fbingo-facil/019eb2d3-4630-7fe0-9bb3-c0e3af5f8ad4/` |
+| Screenshot E2E failure | `e2e-failure.png` (project root)                                                                                    |
+| Este handoff           | `HANDOFF.md`                                                                                                        |
 
 Para retomar a sessão no Grok: `/resume` → selecionar sessão `019eb2d3-4630-7fe0-9bb3-c0e3af5f8ad4`.
 
 ---
 
-*Gerado em 2026-06-10 a partir da sessão Grok "Migrate Firebase System to Turso Database".*
+_Gerado em 2026-06-10 a partir da sessão Grok "Migrate Firebase System to Turso Database"._

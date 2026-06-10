@@ -26,13 +26,13 @@ npm run dev    # http://localhost:3000
 
 ## Comandos
 
-| Comando | Propósito |
-|---------|-----------|
-| `npm run dev` | Servidor de desenvolvimento |
-| `npm run build` | Build de produção → `dist/` |
-| `npm start` | Servidor de produção |
-| `npm test` | Testes Vitest |
-| `npm run lint` | Verificação TypeScript |
+| Comando           | Propósito                                           |
+| ----------------- | --------------------------------------------------- |
+| `npm run dev`     | Servidor de desenvolvimento                         |
+| `npm run build`   | Build de produção → `dist/`                         |
+| `npm start`       | Servidor de produção                                |
+| `npm test`        | Testes Vitest                                       |
+| `npm run lint`    | Verificação TypeScript                              |
 | `npm run db:push` | Drizzle push (pode conflitar com migrations inline) |
 
 ## Variáveis de ambiente

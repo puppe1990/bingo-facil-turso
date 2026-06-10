@@ -1,6 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { EventManage } from '@/src/pages/EventManage';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/event/$eventId')({
-  component: EventManage,
+  component: EventLayout,
 });
+
+function EventLayout() {
+  return <Outlet />;
+}

@@ -35,11 +35,7 @@ async function getOwnedEvent(db: AppDatabase, eventId: string, userId: string) {
 }
 
 export async function listEvents(db: AppDatabase, userId: string) {
-  return db
-    .select()
-    .from(events)
-    .where(eq(events.userId, userId))
-    .orderBy(desc(events.createdAt));
+  return db.select().from(events).where(eq(events.userId, userId)).orderBy(desc(events.createdAt));
 }
 
 export async function getEvent(db: AppDatabase, eventId: string, userId: string) {
@@ -101,11 +97,7 @@ export async function deleteEvent(db: AppDatabase, eventId: string, userId: stri
 
 export async function listCards(db: AppDatabase, eventId: string, userId: string) {
   await getOwnedEvent(db, eventId, userId);
-  return db
-    .select()
-    .from(cards)
-    .where(eq(cards.eventId, eventId))
-    .orderBy(cards.cardNumber);
+  return db.select().from(cards).where(eq(cards.eventId, eventId)).orderBy(cards.cardNumber);
 }
 
 export async function sellCard(
@@ -181,9 +173,6 @@ export async function drawNumber(db: AppDatabase, eventId: string, userId: strin
 export async function resetDraw(db: AppDatabase, eventId: string, userId: string) {
   await getOwnedEvent(db, eventId, userId);
   const now = new Date();
-  await db
-    .update(events)
-    .set({ drawnNumbers: [], updatedAt: now })
-    .where(eq(events.id, eventId));
+  await db.update(events).set({ drawnNumbers: [], updatedAt: now }).where(eq(events.id, eventId));
   return [];
 }

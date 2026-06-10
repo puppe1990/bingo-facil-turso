@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  generateBingoCard75,
-  generateUniqueCards,
-  checkWinner,
-  type BingoCard,
-} from './bingo';
+import { generateBingoCard75, generateUniqueCards, checkWinner, type BingoCard } from './bingo';
 
 describe('generateBingoCard75', () => {
   it('creates a card with FREE in the center N column', () => {
@@ -41,11 +36,7 @@ describe('checkWinner', () => {
 
   it('detects full card winner when all numbers are drawn', () => {
     const drawn = [
-      1, 2, 3, 4, 5,
-      16, 17, 18, 19, 20,
-      31, 32, 34, 35,
-      46, 47, 48, 49, 50,
-      61, 62, 63, 64, 65,
+      1, 2, 3, 4, 5, 16, 17, 18, 19, 20, 31, 32, 34, 35, 46, 47, 48, 49, 50, 61, 62, 63, 64, 65,
     ];
     expect(checkWinner(fullCard, drawn, 'full')).toBe(true);
   });

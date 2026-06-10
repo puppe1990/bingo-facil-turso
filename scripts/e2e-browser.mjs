@@ -18,7 +18,10 @@ try {
   await page.getByText('Meus Bingos').waitFor({ timeout: 20_000 });
 
   console.log('2. Create event...');
-  await page.getByRole('link', { name: /novo bingo/i }).first().click();
+  await page
+    .getByRole('link', { name: /novo bingo/i })
+    .first()
+    .click();
   await page.waitForURL(`${BASE}/create`);
   await page.locator('input[type="text"]').first().fill('Bingo Browser E2E');
   await page.locator('input[type="number"]').fill('2');

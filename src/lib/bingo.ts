@@ -47,7 +47,7 @@ export function generateUniqueCards(quantity: number): BingoCard[] {
       signatures.add(signature);
       cards.push(card);
     }
-    
+
     // Safety break
     if (signatures.size > 1000000) break;
   }
@@ -61,7 +61,11 @@ function isMarked(cell: CellValue, drawn: Set<number>): boolean {
   return cell === 'FREE' || drawn.has(cell);
 }
 
-export function checkWinner(card: BingoCard, drawnNumbers: number[], prizeType: 'line' | 'full'): boolean {
+export function checkWinner(
+  card: BingoCard,
+  drawnNumbers: number[],
+  prizeType: 'line' | 'full',
+): boolean {
   const drawn = new Set(drawnNumbers);
   const letters: (keyof BingoCard)[] = ['B', 'I', 'N', 'G', 'O'];
 

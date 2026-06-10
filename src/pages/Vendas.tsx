@@ -33,10 +33,11 @@ export function Vendas() {
     fetchVendas();
   }, []);
 
-  const filteredVendas = vendas.filter(v =>
-    v.buyerName?.toLowerCase().includes(search.toLowerCase()) ||
-    (v.buyerPhone && v.buyerPhone.includes(search)) ||
-    v.cardNumber.toString().includes(search)
+  const filteredVendas = vendas.filter(
+    (v) =>
+      v.buyerName?.toLowerCase().includes(search.toLowerCase()) ||
+      (v.buyerPhone && v.buyerPhone.includes(search)) ||
+      v.cardNumber.toString().includes(search),
   );
 
   return (
@@ -47,7 +48,9 @@ export function Vendas() {
             <Users className="w-10 h-10 text-amber-500" />
             Histórico de Vendas
           </h1>
-          <p className="text-indigo-400 font-medium mt-2">Veja todas as cartelas vendidas em seus eventos</p>
+          <p className="text-indigo-400 font-medium mt-2">
+            Veja todas as cartelas vendidas em seus eventos
+          </p>
         </div>
 
         <div className="relative group">
@@ -66,17 +69,27 @@ export function Vendas() {
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center gap-4">
             <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
-            <p className="text-indigo-400 font-bold uppercase tracking-widest text-xs">Carregando Vendas...</p>
+            <p className="text-indigo-400 font-bold uppercase tracking-widest text-xs">
+              Carregando Vendas...
+            </p>
           </div>
         ) : filteredVendas.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-indigo-50/50">
-                  <th className="px-8 py-6 text-[10px] font-black text-indigo-300 uppercase tracking-widest">Cartela</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-indigo-300 uppercase tracking-widest">Comprador</th>
-                  <th className="px-8 py-6 text-[10px] font-black text-indigo-300 uppercase tracking-widest">Data/Hora</th>
-                  <th className="px-8 py-6 text-right text-[10px] font-black text-indigo-300 uppercase tracking-widest">Ações</th>
+                  <th className="px-8 py-6 text-[10px] font-black text-indigo-300 uppercase tracking-widest">
+                    Cartela
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-indigo-300 uppercase tracking-widest">
+                    Comprador
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black text-indigo-300 uppercase tracking-widest">
+                    Data/Hora
+                  </th>
+                  <th className="px-8 py-6 text-right text-[10px] font-black text-indigo-300 uppercase tracking-widest">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-indigo-50">
@@ -91,10 +104,14 @@ export function Vendas() {
                     </td>
                     <td className="px-8 py-6">
                       <p className="font-bold text-indigo-900">{venda.buyerName}</p>
-                      {venda.buyerPhone && <p className="text-xs text-indigo-400 font-bold">{venda.buyerPhone}</p>}
+                      {venda.buyerPhone && (
+                        <p className="text-xs text-indigo-400 font-bold">{venda.buyerPhone}</p>
+                      )}
                     </td>
                     <td className="px-8 py-6 text-indigo-400 font-medium">
-                      {venda.updatedAt ? format(new Date(venda.updatedAt), "dd 'de' MMM, HH:mm", { locale: ptBR }) : 'Pendente'}
+                      {venda.updatedAt
+                        ? format(new Date(venda.updatedAt), "dd 'de' MMM, HH:mm", { locale: ptBR })
+                        : 'Pendente'}
                     </td>
                     <td className="px-8 py-6 text-right">
                       <Link
@@ -116,7 +133,9 @@ export function Vendas() {
               <Users className="w-10 h-10 text-indigo-200" />
             </div>
             <h3 className="text-xl font-bold text-indigo-900 mb-2">Nenhuma venda encontrada</h3>
-            <p className="text-indigo-400">Suas vendas aparecerão aqui assim que você registrar cartelas.</p>
+            <p className="text-indigo-400">
+              Suas vendas aparecerão aqui assim que você registrar cartelas.
+            </p>
           </div>
         )}
       </div>

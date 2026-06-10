@@ -42,7 +42,7 @@ export function getDb(): AppDatabase {
 }
 
 const MIGRATION_STATEMENTS = [
-    `CREATE TABLE IF NOT EXISTS user (
+  `CREATE TABLE IF NOT EXISTS user (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT NOT NULL UNIQUE,
@@ -51,7 +51,7 @@ const MIGRATION_STATEMENTS = [
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )`,
-    `CREATE TABLE IF NOT EXISTS session (
+  `CREATE TABLE IF NOT EXISTS session (
       id TEXT PRIMARY KEY,
       expires_at INTEGER NOT NULL,
       token TEXT NOT NULL UNIQUE,
@@ -61,7 +61,7 @@ const MIGRATION_STATEMENTS = [
       user_agent TEXT,
       user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE
     )`,
-    `CREATE TABLE IF NOT EXISTS account (
+  `CREATE TABLE IF NOT EXISTS account (
       id TEXT PRIMARY KEY,
       account_id TEXT NOT NULL,
       provider_id TEXT NOT NULL,
@@ -76,7 +76,7 @@ const MIGRATION_STATEMENTS = [
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )`,
-    `CREATE TABLE IF NOT EXISTS verification (
+  `CREATE TABLE IF NOT EXISTS verification (
       id TEXT PRIMARY KEY,
       identifier TEXT NOT NULL,
       value TEXT NOT NULL,
@@ -84,7 +84,7 @@ const MIGRATION_STATEMENTS = [
       created_at INTEGER,
       updated_at INTEGER
     )`,
-    `CREATE TABLE IF NOT EXISTS events (
+  `CREATE TABLE IF NOT EXISTS events (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
       name TEXT NOT NULL,
@@ -97,7 +97,7 @@ const MIGRATION_STATEMENTS = [
       created_at INTEGER NOT NULL DEFAULT (unixepoch()),
       updated_at INTEGER
     )`,
-    `CREATE TABLE IF NOT EXISTS cards (
+  `CREATE TABLE IF NOT EXISTS cards (
       id TEXT PRIMARY KEY,
       event_id TEXT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
@@ -109,9 +109,9 @@ const MIGRATION_STATEMENTS = [
       created_at INTEGER NOT NULL DEFAULT (unixepoch()),
       updated_at INTEGER
     )`,
-    `CREATE INDEX IF NOT EXISTS idx_events_user_created ON events(user_id, created_at)`,
-    `CREATE INDEX IF NOT EXISTS idx_cards_event_number ON cards(event_id, card_number)`,
-    `CREATE INDEX IF NOT EXISTS idx_cards_user_status ON cards(user_id, status, updated_at)`,
+  `CREATE INDEX IF NOT EXISTS idx_events_user_created ON events(user_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS idx_cards_event_number ON cards(event_id, card_number)`,
+  `CREATE INDEX IF NOT EXISTS idx_cards_user_status ON cards(user_id, status, updated_at)`,
 ];
 
 export async function migrateClient(libsql: Client): Promise<void> {

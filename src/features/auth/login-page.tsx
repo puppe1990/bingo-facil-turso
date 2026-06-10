@@ -47,13 +47,19 @@ export function LoginPage() {
               <div className="w-20 h-20 bg-amber-400 rounded-3xl flex items-center justify-center shadow-2xl mb-6 rotate-3 transform hover:rotate-0 transition-transform">
                 <Ticket className="w-10 h-10 text-indigo-900" />
               </div>
-              <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">Bingo Master</h1>
-              <p className="text-indigo-300 font-bold uppercase tracking-[0.2em] text-[10px]">Gerenciador de Eventos</p>
+              <h1 className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-2">
+                Bingo Master
+              </h1>
+              <p className="text-indigo-300 font-bold uppercase tracking-[0.2em] text-[10px]">
+                Gerenciador de Eventos
+              </p>
             </div>
           </div>
 
           <div className="p-12">
-            <h2 className="text-2xl font-black text-indigo-900 uppercase italic mb-4 text-center">Bem-vindo ao Jogo</h2>
+            <h2 className="text-2xl font-black text-indigo-900 uppercase italic mb-4 text-center">
+              Bem-vindo ao Jogo
+            </h2>
             <p className="text-indigo-400 font-medium mb-8 leading-relaxed text-center">
               Crie, gerencie e realize sorteios profissionais com conferência automática.
             </p>
@@ -66,7 +72,9 @@ export function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">E-mail</label>
+                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">
+                  E-mail
+                </label>
                 <input
                   type="email"
                   required
@@ -77,7 +85,9 @@ export function LoginPage() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">Senha</label>
+                <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2">
+                  Senha
+                </label>
                 <input
                   type="password"
                   required
