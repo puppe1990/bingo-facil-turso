@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { drawNumberFn, getEventFn, listCardsFn, resetDrawFn } from '../server/events.functions';
+import { Route as LiveDrawRoute } from '../app/_authenticated/event/$eventId/live';
+import { drawNumberFn, getEventFn, resetDrawFn } from '../server/events.functions';
 import { checkWinner, BingoCard } from '../lib/bingo';
 import { ArrowLeft, Play, RotateCcw, Monitor, Trophy, AlertCircle, CheckCircle2, Volume2, VolumeX, ListRestart, Ticket } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -16,7 +17,8 @@ interface CardData {
 
 export function LiveDraw() {
   const { eventId } = useParams({ from: '/_authenticated/event/$eventId/live' });
-  const [cards, setCards] = useState<CardData[]>([]);
+  const loaderData = LiveDrawRoute.useLoaderData();
+  const [cards, setCards] = useState<CardData[]>(loaderData.cards as CardData[]);
   const [winners, setWinners] = useState<CardData[]>([]);
   const [isProjection, setIsProjection] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -24,21 +26,13 @@ export function LiveDraw() {
   const { data: event, isLoading, refetch } = useQuery({
     queryKey: ['event-draw', eventId],
     queryFn: () => getEventFn({ data: { eventId } }),
+    initialData: loaderData.event,
     refetchInterval: 1500,
     enabled: !!eventId,
   });
 
   const drawnNumbers = event?.drawnNumbers ?? [];
-  const loading = isLoading;
-
-  useEffect(() => {
-    async function loadCards() {
-      if (!eventId) return;
-      const allCards = await listCardsFn({ data: { eventId } });
-      setCards((allCards as CardData[]).filter(c => c.status === 'sold'));
-    }
-    loadCards();
-  }, [eventId]);
+  const loading = isLoading && !event;
 
   const lastNumber = drawnNumbers[drawnNumbers.length - 1];
 

@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port=3000 --host=0.0.0.0",
+    "dev:clean": "npm run clean && vite dev --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "start": "node dist/server/server.js",
     "preview": "vite preview",
-    "clean": "rm -rf dist .output",
+    "clean": "rm -rf dist .output node_modules/.vite .tanstack/tmp",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
