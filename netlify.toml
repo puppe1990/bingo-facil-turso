@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["dist/server/**", "node_modules/drizzle-orm/**", "node_modules/@libsql/client/**"]
+  external_node_modules = ["drizzle-orm", "@libsql/client"]

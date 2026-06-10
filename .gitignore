@@ -10,3 +10,5 @@ data/*.sqlite
 data/*.sqlite-*
 .playwright-cli/
 e2e-failure.png
+# Local Netlify folder
+.netlify

@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import netlify from '@netlify/vite-plugin-tanstack-start';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import tsConfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vite';
@@ -11,6 +12,12 @@ export default defineConfig({
     host: '0.0.0.0',
     hmr: process.env.DISABLE_HMR !== 'true',
   },
+  resolve: {
+    conditions: ['netlify', 'import', 'module', 'browser', 'default'],
+  },
+  ssr: {
+    external: ['libsql', '@libsql/linux-x64-gnu'],
+  },
   plugins: [
     tsConfigPaths(),
     tanstackStart({
@@ -20,6 +27,7 @@ export default defineConfig({
         routeFileIgnorePattern: '\\.test\\.',
       },
     }),
+    netlify(),
     react(),
     tailwindcss(),
     warmupServerFnsPlugin(),

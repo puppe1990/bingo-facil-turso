@@ -1,5 +1,5 @@
-import { createClient, type Client } from '@libsql/client';
-import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql';
+import type { Client } from '@libsql/client';
+import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 
 export type AppDatabase = LibSQLDatabase<typeof schema>;
@@ -7,12 +7,27 @@ export type AppDatabase = LibSQLDatabase<typeof schema>;
 let client: Client | null = null;
 let dbInstance: AppDatabase | null = null;
 
-export function createDbConnection(url: string, authToken?: string): AppDatabase {
-  const libsql = createClient({
-    url,
-    authToken: authToken || undefined,
-  });
-  return drizzle(libsql, { schema });
+function isRemoteLibsqlUrl(url: string): boolean {
+  return url.startsWith('libsql://') || url.startsWith('https://') || url.startsWith('http://');
+}
+
+async function createLibsqlClient(url: string, authToken?: string) {
+  if (isRemoteLibsqlUrl(url)) {
+    const { createClient } = await import('@libsql/client/web');
+    const { drizzle } = await import('drizzle-orm/libsql/web');
+    const libsql = createClient({ url, authToken: authToken || undefined });
+    return { client: libsql, db: drizzle(libsql, { schema }) };
+  }
+
+  const { createClient } = await import('@libsql/client');
+  const { drizzle } = await import('drizzle-orm/libsql');
+  const libsql = createClient({ url, authToken: authToken || undefined });
+  return { client: libsql, db: drizzle(libsql, { schema }) };
+}
+
+export async function createDbConnection(url: string, authToken?: string): Promise<AppDatabase> {
+  const { db } = await createLibsqlClient(url, authToken);
+  return db;
 }
 
 let initPromise: Promise<AppDatabase> | null = null;
@@ -23,9 +38,10 @@ export async function getDbReady(): Promise<AppDatabase> {
       initPromise = (async () => {
         const url = process.env.TURSO_DATABASE_URL ?? 'file:./data/bingo-facil.sqlite';
         const authToken = process.env.TURSO_AUTH_TOKEN;
-        client = createClient({ url, authToken: authToken || undefined });
+        const connection = await createLibsqlClient(url, authToken);
+        client = connection.client;
         await migrateClient(client);
-        dbInstance = drizzle(client, { schema });
+        dbInstance = connection.db;
         return dbInstance;
       })();
     }
