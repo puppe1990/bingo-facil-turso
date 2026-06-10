@@ -1,4 +1,11 @@
-import { Settings as SettingsIcon, User, Shield, Bell, CreditCard, ExternalLink } from 'lucide-react';
+import {
+  Settings as SettingsIcon,
+  User,
+  Shield,
+  Bell,
+  CreditCard,
+  ExternalLink,
+} from 'lucide-react';
 import { useSession } from '../lib/auth-client';
 
 export function Settings() {
@@ -13,7 +20,9 @@ export function Settings() {
           <SettingsIcon className="w-10 h-10 text-amber-500" />
           Ajustes
         </h1>
-        <p className="text-indigo-400 font-medium mt-2">Gerencie sua conta e preferências do sistema</p>
+        <p className="text-indigo-400 font-medium mt-2">
+          Gerencie sua conta e preferências do sistema
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -42,7 +51,9 @@ export function Settings() {
 
         <div className="md:col-span-2 space-y-6">
           <div className="bg-white p-8 rounded-[2.5rem] border-2 border-indigo-50 shadow-sm">
-            <h2 className="text-xl font-black text-indigo-900 uppercase italic mb-6">Informações do Perfil</h2>
+            <h2 className="text-xl font-black text-indigo-900 uppercase italic mb-6">
+              Informações do Perfil
+            </h2>
 
             <div className="space-y-6">
               <div className="flex items-center gap-6">
@@ -50,15 +61,21 @@ export function Settings() {
                   {userInitial}
                 </div>
                 <div>
-                  <p className="font-black text-indigo-900 text-lg leading-none mb-1">{user?.name}</p>
+                  <p className="font-black text-indigo-900 text-lg leading-none mb-1">
+                    {user?.name}
+                  </p>
                   <p className="text-indigo-400 font-medium text-sm">{user?.email}</p>
-                  <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Conta Pro Platinium</span>
+                  <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                    Conta Pro Platinium
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2 ml-1">E-mail de Contato</label>
+                  <label className="block text-[10px] font-black text-indigo-300 uppercase tracking-widest mb-2 ml-1">
+                    E-mail de Contato
+                  </label>
                   <input
                     type="text"
                     readOnly
@@ -83,7 +100,8 @@ export function Settings() {
                 Suporte Premium Ativo
               </h3>
               <p className="text-amber-800/70 font-medium text-sm leading-relaxed mb-6">
-                Como usuário Pro, você tem acesso prioritário ao nosso time de suporte via WhatsApp e E-mail.
+                Como usuário Pro, você tem acesso prioritário ao nosso time de suporte via WhatsApp
+                e E-mail.
               </p>
               <button className="flex items-center gap-2 text-amber-900 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
                 Acessar Central de Ajuda <ExternalLink className="w-4 h-4" />

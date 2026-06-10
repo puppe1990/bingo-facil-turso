@@ -1,9 +1,6 @@
 import type { Plugin } from 'vite';
 
-const SERVER_FN_FILES = [
-  'src/server/auth.functions.ts',
-  'src/server/events.functions.ts',
-] as const;
+const SERVER_FN_FILES = ['src/server/auth.functions.ts', 'src/server/events.functions.ts'] as const;
 
 /**
  * TanStack Start can throw "Invalid server function ID" after a dev-server

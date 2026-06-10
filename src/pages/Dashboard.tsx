@@ -31,14 +31,23 @@ export function Dashboard() {
     fetchEvents();
   }, []);
 
-  if (loading) return <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-black text-indigo-900 leading-tight uppercase">Meus Bingos</h1>
-          <p className="text-indigo-600 font-medium">Gerencie seus eventos e acompanhe as vendas.</p>
+          <h1 className="text-4xl font-black text-indigo-900 leading-tight uppercase">
+            Meus Bingos
+          </h1>
+          <p className="text-indigo-600 font-medium">
+            Gerencie seus eventos e acompanhe as vendas.
+          </p>
         </div>
         <Link
           to="/create"
@@ -56,8 +65,12 @@ export function Dashboard() {
               <Ticket className="w-16 h-16 text-indigo-300" />
             </div>
           </div>
-          <h3 className="text-2xl font-black text-indigo-900 uppercase">Tudo pronto para começar?</h3>
-          <p className="text-indigo-600 mb-8 max-w-sm mx-auto">Crie seu primeiro evento e comece a gerar cartelas profissionais em segundos.</p>
+          <h3 className="text-2xl font-black text-indigo-900 uppercase">
+            Tudo pronto para começar?
+          </h3>
+          <p className="text-indigo-600 mb-8 max-w-sm mx-auto">
+            Crie seu primeiro evento e comece a gerar cartelas profissionais em segundos.
+          </p>
           <Link
             to="/create"
             className="inline-flex items-center gap-2 bg-indigo-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-800 transition-all"
@@ -80,16 +93,20 @@ export function Dashboard() {
                 <div className="bg-amber-400 p-4 rounded-2xl shadow-lg border-2 border-white">
                   <Ticket className="w-8 h-8 text-indigo-900" />
                 </div>
-                <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${
-                  event.status === 'active'
-                    ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-50'
-                    : 'bg-indigo-50 text-indigo-400'
-                }`}>
+                <span
+                  className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${
+                    event.status === 'active'
+                      ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-50'
+                      : 'bg-indigo-50 text-indigo-400'
+                  }`}
+                >
                   {event.status === 'active' ? '● Rodando' : 'Finalizado'}
                 </span>
               </div>
 
-              <h3 className="text-2xl font-black text-indigo-900 mb-2 truncate uppercase leading-tight">{event.name}</h3>
+              <h3 className="text-2xl font-black text-indigo-900 mb-2 truncate uppercase leading-tight">
+                {event.name}
+              </h3>
 
               <div className="space-y-3 pt-4 border-t border-indigo-50 mt-4">
                 <div className="flex items-center gap-3 text-indigo-400 font-bold text-sm">
