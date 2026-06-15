@@ -7,10 +7,24 @@ import * as schema from './db/schema';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let authInstance: any = null;
 
+function getTrustedOrigins(baseURL: string): string[] {
+  const origins = new Set<string>([baseURL]);
+
+  if (process.env.NODE_ENV !== 'production') {
+    for (const port of [3000, 3001, 5173]) {
+      origins.add(`http://localhost:${port}`);
+      origins.add(`http://127.0.0.1:${port}`);
+    }
+  }
+
+  return [...origins];
+}
+
 export async function getAuth() {
   if (!authInstance) {
     await getDbReady();
     const db = getDb();
+    const baseURL = process.env.BETTER_AUTH_URL ?? 'http://localhost:3001';
     authInstance = betterAuth({
       database: drizzleAdapter(db, {
         provider: 'sqlite',
@@ -21,14 +35,17 @@ export async function getAuth() {
           verification: schema.verification,
         },
       }),
-      baseURL: process.env.BETTER_AUTH_URL ?? 'http://localhost:3000',
+      baseURL,
       basePath: '/api/auth',
       secret: process.env.BETTER_AUTH_SECRET,
       emailAndPassword: {
         enabled: true,
         autoSignIn: true,
       },
-      trustedOrigins: [process.env.BETTER_AUTH_URL ?? 'http://localhost:3000'],
+      trustedOrigins: getTrustedOrigins(baseURL),
+      ...(process.env.NODE_ENV !== 'production' && {
+        advanced: { disableOriginCheck: true },
+      }),
       plugins: [tanstackStartCookies()],
     });
   }

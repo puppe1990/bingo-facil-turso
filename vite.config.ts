@@ -8,7 +8,7 @@ import { warmupServerFnsPlugin } from './scripts/warmup-server-fns-plugin';
 
 export default defineConfig({
   server: {
-    port: 3000,
+    port: 3001,
     host: '0.0.0.0',
     hmr: process.env.DISABLE_HMR !== 'true',
   },
