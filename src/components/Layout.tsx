@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { signOut, useSession } from '../lib/auth-client';
+import { BrandMark } from './BrandMark';
 import { LogOut, LayoutDashboard, PlusCircle, Ticket, Users, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -22,9 +23,7 @@ export function Layout({ children }: { children?: ReactNode }) {
     <div className="flex min-h-screen bg-yellow-50 font-sans pb-20 md:pb-0">
       <aside className="hidden md:flex w-64 bg-indigo-800 text-white flex-col fixed inset-y-0 z-50">
         <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center text-indigo-900 font-black text-xl shadow-lg border-2 border-white/20">
-            B
-          </div>
+          <BrandMark className="w-10 h-10" letterClassName="text-xl" />
           <h1 className="text-xl font-black tracking-tight uppercase">Bingo Fácil</h1>
         </div>
 
