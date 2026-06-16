@@ -1,33 +1,33 @@
 import { useEffect, useState } from 'react';
-import {
-  Settings as SettingsIcon,
-  User,
-  Shield,
-  Bell,
-  CreditCard,
-  ExternalLink,
-} from 'lucide-react';
+import { Settings as SettingsIcon, User, Shield, CreditCard, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useSession } from '../lib/auth-client';
 import { ChangePasswordForm } from '../features/settings/change-password-form';
 import { getUserSubscriptionFn } from '../server/subscriptions.functions';
-import { formatPlanLabel, formatStatusLabel } from '../lib/ui/subscription-badges';
+import { getUserAccessForSessionFn } from '../server/user-access.functions';
+import { formatStatusLabel } from '../lib/ui/subscription-badges';
+import {
+  formatAccessValidUntil,
+  formatUserAccessLabel,
+  getUserAccessBadgeClass,
+} from '../lib/ui/user-access-badges';
+import type { UserAccessSessionView } from '../server/user-access.server';
 
-type SettingsTab = 'perfil' | 'seguranca' | 'notificacoes' | 'assinatura';
+type SettingsTab = 'perfil' | 'seguranca' | 'assinatura';
 
 type UserSubscription = Awaited<ReturnType<typeof getUserSubscriptionFn>>;
 
 const NAV_ITEMS: { id: SettingsTab; icon: typeof User; label: string }[] = [
   { id: 'perfil', icon: User, label: 'Perfil' },
   { id: 'seguranca', icon: Shield, label: 'Segurança' },
-  { id: 'notificacoes', icon: Bell, label: 'Notificações' },
   { id: 'assinatura', icon: CreditCard, label: 'Assinatura' },
 ];
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('perfil');
   const [subscription, setSubscription] = useState<UserSubscription>(null);
+  const [userAccess, setUserAccess] = useState<UserAccessSessionView | null>(null);
   const { data: session } = useSession();
   const user = session?.user;
   const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? 'U';
@@ -36,10 +36,20 @@ export function Settings() {
     getUserSubscriptionFn()
       .then(setSubscription)
       .catch(() => setSubscription(null));
+    getUserAccessForSessionFn()
+      .then(setUserAccess)
+      .catch(() => setUserAccess(null));
   }, []);
 
-  const planLabel = subscription ? formatPlanLabel(subscription.plan) : 'Sem assinatura';
-  const statusLabel = subscription ? formatStatusLabel(subscription.effectiveStatus) : 'Inativa';
+  const subscriptionStatusLabel = subscription
+    ? formatStatusLabel(subscription.effectiveStatus)
+    : 'Inativa';
+  const accessStatusLabel = userAccess
+    ? formatUserAccessLabel(userAccess.effectiveStatus)
+    : 'Indisponível';
+  const accessValidUntil = userAccess
+    ? formatAccessValidUntil(userAccess.effectiveStatus, userAccess.accessExpiresAt)
+    : '—';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl">
@@ -92,9 +102,13 @@ export function Settings() {
                         {user?.name}
                       </p>
                       <p className="text-indigo-400 font-medium text-sm">{user?.email}</p>
-                      <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                        Conta {planLabel}
-                      </span>
+                      {userAccess && (
+                        <span
+                          className={`inline-block mt-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getUserAccessBadgeClass(userAccess.effectiveStatus)}`}
+                        >
+                          {accessStatusLabel}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -114,7 +128,7 @@ export function Settings() {
                 </div>
               </div>
 
-              {subscription?.effectiveStatus === 'active' && (
+              {subscription?.effectiveStatus === 'active' && userAccess?.canAccess && (
                 <div className="bg-amber-50 p-8 rounded-[2.5rem] border-2 border-amber-100 relative overflow-hidden">
                   <div className="absolute top-[-20%] right-[-10%] w-40 h-40 bg-amber-200/20 rounded-full blur-3xl" />
                   <div className="relative z-10">
@@ -122,8 +136,7 @@ export function Settings() {
                       Suporte Premium Ativo
                     </h3>
                     <p className="text-amber-800/70 font-medium text-sm leading-relaxed mb-6">
-                      Como usuário {planLabel}, você tem acesso prioritário ao nosso time de
-                      suporte.
+                      Você tem acesso prioritário ao nosso time de suporte.
                     </p>
                     <button className="flex items-center gap-2 text-amber-900 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
                       Acessar Central de Ajuda <ExternalLink className="w-4 h-4" />
@@ -147,39 +160,67 @@ export function Settings() {
           )}
 
           {activeTab === 'assinatura' && (
-            <div className="bg-white p-8 rounded-[2.5rem] border-2 border-indigo-50 shadow-sm space-y-6">
-              <h2 className="text-xl font-black text-indigo-900 uppercase italic">
-                Sua Assinatura
-              </h2>
+            <div className="bg-white p-8 rounded-[2.5rem] border-2 border-indigo-50 shadow-sm space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-xl font-black text-indigo-900 uppercase italic">
+                  Acesso à plataforma
+                </h2>
+                {userAccess ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                      <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                        Status
+                      </span>
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getUserAccessBadgeClass(userAccess.effectiveStatus)}`}
+                      >
+                        {accessStatusLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                      <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                        Válido até
+                      </span>
+                      <span className="font-black text-indigo-900 text-right max-w-[60%]">
+                        {accessValidUntil}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-indigo-400 font-bold">
+                    Não foi possível carregar o status de acesso.
+                  </p>
+                )}
+              </div>
 
-              {subscription ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
-                    <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
-                      Plano
-                    </span>
-                    <span className="font-black text-indigo-900">{planLabel}</span>
+              <div className="space-y-4">
+                <h2 className="text-xl font-black text-indigo-900 uppercase italic">
+                  Sua Assinatura
+                </h2>
+
+                {subscription ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                      <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                        Status da assinatura
+                      </span>
+                      <span className="font-black text-indigo-900">{subscriptionStatusLabel}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                      <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                        Expira em
+                      </span>
+                      <span className="font-black text-indigo-900">
+                        {format(subscription.expiresAt, 'dd/MM/yyyy', { locale: ptBR })}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
-                    <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
-                      Status
-                    </span>
-                    <span className="font-black text-indigo-900">{statusLabel}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
-                    <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
-                      Expira em
-                    </span>
-                    <span className="font-black text-indigo-900">
-                      {format(subscription.expiresAt, 'dd/MM/yyyy', { locale: ptBR })}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-indigo-400 font-bold">
-                  Você ainda não possui uma assinatura ativa.
-                </p>
-              )}
+                ) : (
+                  <p className="text-indigo-400 font-bold">
+                    Você ainda não possui uma assinatura ativa.
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
