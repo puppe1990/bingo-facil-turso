@@ -16,6 +16,7 @@ import { Route as AuthenticatedIndexRouteImport } from './app/_authenticated/ind
 import { Route as AuthenticatedVendasRouteImport } from './app/_authenticated/vendas'
 import { Route as AuthenticatedCreateRouteImport } from './app/_authenticated/create'
 import { Route as AuthenticatedConfigRouteImport } from './app/_authenticated/config'
+import { Route as AuthenticatedAguardandoRouteImport } from './app/_authenticated/aguardando'
 import { Route as ApiAuthSplatRouteImport } from './app/api/auth/$'
 import { Route as AuthenticatedEventEventIdRouteImport } from './app/_authenticated/event/$eventId'
 import { Route as AuthenticatedEventEventIdIndexRouteImport } from './app/_authenticated/event/$eventId/index'
@@ -55,6 +56,11 @@ const AuthenticatedConfigRoute = AuthenticatedConfigRouteImport.update({
   path: '/config',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAguardandoRoute = AuthenticatedAguardandoRouteImport.update({
+  id: '/aguardando',
+  path: '/aguardando',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/aguardando': typeof AuthenticatedAguardandoRoute
   '/config': typeof AuthenticatedConfigRoute
   '/create': typeof AuthenticatedCreateRoute
   '/vendas': typeof AuthenticatedVendasRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/aguardando': typeof AuthenticatedAguardandoRoute
   '/config': typeof AuthenticatedConfigRoute
   '/create': typeof AuthenticatedCreateRoute
   '/vendas': typeof AuthenticatedVendasRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/aguardando': typeof AuthenticatedAguardandoRoute
   '/_authenticated/config': typeof AuthenticatedConfigRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
   '/_authenticated/vendas': typeof AuthenticatedVendasRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/signup'
+    | '/aguardando'
     | '/config'
     | '/create'
     | '/vendas'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/signup'
+    | '/aguardando'
     | '/config'
     | '/create'
     | '/vendas'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/signup'
+    | '/_authenticated/aguardando'
     | '/_authenticated/config'
     | '/_authenticated/create'
     | '/_authenticated/vendas'
@@ -213,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfigRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/aguardando': {
+      id: '/_authenticated/aguardando'
+      path: '/aguardando'
+      fullPath: '/aguardando'
+      preLoaderRoute: typeof AuthenticatedAguardandoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -261,6 +280,7 @@ const AuthenticatedEventEventIdRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAguardandoRoute: typeof AuthenticatedAguardandoRoute
   AuthenticatedConfigRoute: typeof AuthenticatedConfigRoute
   AuthenticatedCreateRoute: typeof AuthenticatedCreateRoute
   AuthenticatedVendasRoute: typeof AuthenticatedVendasRoute
@@ -269,6 +289,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAguardandoRoute: AuthenticatedAguardandoRoute,
   AuthenticatedConfigRoute: AuthenticatedConfigRoute,
   AuthenticatedCreateRoute: AuthenticatedCreateRoute,
   AuthenticatedVendasRoute: AuthenticatedVendasRoute,

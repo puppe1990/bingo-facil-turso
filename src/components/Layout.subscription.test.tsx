@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Layout } from '@/src/components/Layout';
 import { useSession } from '@/src/lib/auth-client';
-import { getUserSubscriptionFn } from '@/src/server/subscriptions.functions';
+import { getUserAccessForSessionFn } from '@/src/server/user-access.functions';
 
 vi.mock('@tanstack/react-router', async () => {
   const actual = await vi.importActual('@tanstack/react-router');
@@ -23,8 +23,8 @@ vi.mock('@/src/lib/auth-client', () => ({
   signOut: vi.fn(),
 }));
 
-vi.mock('@/src/server/subscriptions.functions', () => ({
-  getUserSubscriptionFn: vi.fn(),
+vi.mock('@/src/server/user-access.functions', () => ({
+  getUserAccessForSessionFn: vi.fn(),
 }));
 
 describe('Layout subscription label', () => {
@@ -42,19 +42,50 @@ describe('Layout subscription label', () => {
     } as ReturnType<typeof useSession>);
   });
 
-  it('shows real plan label in sidebar', async () => {
-    vi.mocked(getUserSubscriptionFn).mockResolvedValue({
-      plan: 'pro',
-      status: 'active',
+  it('shows access status in sidebar when access is active', async () => {
+    vi.mocked(getUserAccessForSessionFn).mockResolvedValue({
+      isActive: true,
+      accessExpiresAt: new Date('2026-12-31'),
       effectiveStatus: 'active',
-      expiresAt: new Date('2026-12-31'),
+      canAccess: true,
     });
 
     render(<Layout />);
 
     await waitFor(() => {
-      expect(screen.getByText('Pro')).toBeInTheDocument();
+      expect(screen.getByText('Acesso ativo')).toBeInTheDocument();
     });
-    expect(screen.queryByText(/PRO • Ilimitado/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('Pro')).not.toBeInTheDocument();
+  });
+
+  it('shows aguardando ativação in sidebar when access is inactive', async () => {
+    vi.mocked(getUserAccessForSessionFn).mockResolvedValue({
+      isActive: false,
+      accessExpiresAt: null,
+      effectiveStatus: 'inactive',
+      canAccess: false,
+    });
+
+    render(<Layout />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Aguardando ativação')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Pro')).not.toBeInTheDocument();
+  });
+
+  it('shows acesso expirado in sidebar when access is expired', async () => {
+    vi.mocked(getUserAccessForSessionFn).mockResolvedValue({
+      isActive: true,
+      accessExpiresAt: new Date('2025-01-01'),
+      effectiveStatus: 'expired',
+      canAccess: false,
+    });
+
+    render(<Layout />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Acesso expirado')).toBeInTheDocument();
+    });
   });
 });

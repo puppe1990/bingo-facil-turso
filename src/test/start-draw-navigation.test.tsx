@@ -63,6 +63,24 @@ vi.mock('../server/subscriptions.functions', () => ({
   getUserSubscriptionFn: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock('../server/user-access.functions', () => ({
+  assertUserCanAccessFn: vi.fn().mockResolvedValue({
+    ok: true,
+    access: {
+      isActive: true,
+      accessExpiresAt: new Date('2026-12-31'),
+      effectiveStatus: 'active',
+      canAccess: true,
+    },
+  }),
+  getUserAccessForSessionFn: vi.fn().mockResolvedValue({
+    isActive: true,
+    accessExpiresAt: new Date('2026-12-31'),
+    effectiveStatus: 'active',
+    canAccess: true,
+  }),
+}));
+
 Object.defineProperty(window, 'speechSynthesis', {
   writable: true,
   value: { speak: vi.fn(), cancel: vi.fn() },

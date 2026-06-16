@@ -52,9 +52,19 @@ describe('e2e flow: signup → event → sell → draw', () => {
 
     const [dbUser] = await getDb().select().from(user).where(eq(user.email, email)).limit(1);
     expect(dbUser).toBeTruthy();
+    expect(dbUser!.isActive).toBe(false);
 
     const userId = dbUser!.id;
     const db = getDb();
+
+    await db
+      .update(user)
+      .set({
+        isActive: true,
+        accessExpiresAt: new Date('2027-01-01'),
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, userId));
 
     const eventId = await createEventWithCards(db, userId, {
       name: 'Bingo Beneficente E2E',

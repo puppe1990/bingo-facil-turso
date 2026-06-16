@@ -111,12 +111,6 @@ export function LoginPage() {
                 Criar conta
               </Link>
             </p>
-
-            <div className="mt-10 pt-10 border-t-2 border-indigo-50">
-              <p className="text-[10px] font-black text-indigo-200 uppercase tracking-[0.3em] mt-4 text-center">
-                Potencializado por Turso
-              </p>
-            </div>
           </div>
         </div>
 

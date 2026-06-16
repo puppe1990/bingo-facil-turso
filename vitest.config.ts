@@ -15,7 +15,12 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'src/test/**/*.test.{ts,tsx}', 'app/**/*.test.{ts,tsx}'],
+    include: [
+      'src/**/*.test.{ts,tsx}',
+      'src/test/**/*.test.{ts,tsx}',
+      'app/**/*.test.{ts,tsx}',
+      'shared/**/*.test.ts',
+    ],
     exclude: ['node_modules/**', 'dist/**'],
     env: {
       BETTER_AUTH_URL: 'http://localhost:3001',

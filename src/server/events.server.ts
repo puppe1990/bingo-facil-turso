@@ -2,6 +2,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { generateUniqueCards } from '../lib/bingo';
 import type { AppDatabase } from '../lib/db/index';
 import { cards, events } from '../lib/db/schema';
+import { assertUserCanAccess } from './user-access.server';
 
 export class UnauthorizedError extends Error {
   constructor(message = 'Unauthorized') {
@@ -35,10 +36,12 @@ async function getOwnedEvent(db: AppDatabase, eventId: string, userId: string) {
 }
 
 export async function listEvents(db: AppDatabase, userId: string) {
+  await assertUserCanAccess(db, userId);
   return db.select().from(events).where(eq(events.userId, userId)).orderBy(desc(events.createdAt));
 }
 
 export async function getEvent(db: AppDatabase, eventId: string, userId: string) {
+  await assertUserCanAccess(db, userId);
   return getOwnedEvent(db, eventId, userId);
 }
 
@@ -53,6 +56,7 @@ export async function createEventWithCards(
     footerText?: string;
   },
 ) {
+  await assertUserCanAccess(db, userId);
   const eventId = crypto.randomUUID();
   const bingoCards = generateUniqueCards(input.totalCards);
   const now = new Date();
@@ -91,11 +95,13 @@ export async function createEventWithCards(
 }
 
 export async function deleteEvent(db: AppDatabase, eventId: string, userId: string) {
+  await assertUserCanAccess(db, userId);
   await getOwnedEvent(db, eventId, userId);
   await db.delete(events).where(and(eq(events.id, eventId), eq(events.userId, userId)));
 }
 
 export async function listCards(db: AppDatabase, eventId: string, userId: string) {
+  await assertUserCanAccess(db, userId);
   await getOwnedEvent(db, eventId, userId);
   return db.select().from(cards).where(eq(cards.eventId, eventId)).orderBy(cards.cardNumber);
 }
@@ -108,6 +114,7 @@ export async function sellCard(
   buyerName: string,
   buyerPhone?: string,
 ) {
+  await assertUserCanAccess(db, userId);
   await getOwnedEvent(db, eventId, userId);
   const now = new Date();
   await db
@@ -122,6 +129,7 @@ export async function sellCard(
 }
 
 export async function listSoldCards(db: AppDatabase, userId: string) {
+  await assertUserCanAccess(db, userId);
   const sold = await db
     .select()
     .from(cards)
@@ -148,6 +156,7 @@ export async function listSoldCards(db: AppDatabase, userId: string) {
 }
 
 export async function drawNumber(db: AppDatabase, eventId: string, userId: string) {
+  await assertUserCanAccess(db, userId);
   const event = await getOwnedEvent(db, eventId, userId);
   const drawn = event.drawnNumbers ?? [];
 
@@ -172,6 +181,7 @@ export async function drawNumber(db: AppDatabase, eventId: string, userId: strin
 }
 
 export async function resetDraw(db: AppDatabase, eventId: string, userId: string) {
+  await assertUserCanAccess(db, userId);
   await getOwnedEvent(db, eventId, userId);
   const now = new Date();
   await db.update(events).set({ drawnNumbers: [], updatedAt: now }).where(eq(events.id, eventId));
