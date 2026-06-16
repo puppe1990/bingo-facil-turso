@@ -132,10 +132,11 @@ export async function listSoldCards(db: AppDatabase, userId: string) {
   const eventMap = new Map<string, string>();
 
   for (const eventId of eventIds) {
+    const id = String(eventId);
     const [event] = await db
       .select({ id: events.id, name: events.name })
       .from(events)
-      .where(eq(events.id, eventId))
+      .where(eq(events.id, id))
       .limit(1);
     if (event) eventMap.set(event.id, event.name);
   }

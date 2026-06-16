@@ -1,6 +1,7 @@
-import type { Client } from '@libsql/client';
+import type { Client } from '@libsql/client/web';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as schema from './schema';
+import { migrateClient } from './migrate';
 
 export type AppDatabase = LibSQLDatabase<typeof schema>;
 
@@ -11,23 +12,50 @@ function isRemoteLibsqlUrl(url: string): boolean {
   return url.startsWith('libsql://') || url.startsWith('https://') || url.startsWith('http://');
 }
 
-async function createLibsqlClient(url: string, authToken?: string) {
-  if (isRemoteLibsqlUrl(url)) {
+function isServerlessRuntime(): boolean {
+  return process.env.NETLIFY === 'true' || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
+}
+
+function resolveDatabaseConfig(): { url: string; authToken?: string } {
+  const url = process.env.TURSO_DATABASE_URL;
+
+  if (isServerlessRuntime()) {
+    if (!url || !process.env.TURSO_AUTH_TOKEN) {
+      throw new Error('Turso is required on Netlify. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN.');
+    }
+    return { url, authToken: process.env.TURSO_AUTH_TOKEN };
+  }
+
+  if (url && isRemoteLibsqlUrl(url)) {
+    if (!process.env.TURSO_AUTH_TOKEN) {
+      throw new Error('TURSO_AUTH_TOKEN is required when using a remote Turso URL.');
+    }
+    return { url, authToken: process.env.TURSO_AUTH_TOKEN };
+  }
+
+  return { url: url ?? 'file:./data/bingo-facil.sqlite' };
+}
+
+async function createConnection(url: string, authToken?: string) {
+  if (isRemoteLibsqlUrl(url) || isServerlessRuntime()) {
     const { createClient } = await import('@libsql/client/web');
     const { drizzle } = await import('drizzle-orm/libsql/web');
     const libsql = createClient({ url, authToken: authToken || undefined });
     return { client: libsql, db: drizzle(libsql, { schema }) };
   }
 
-  const { createClient } = await import('@libsql/client');
-  const { drizzle } = await import('drizzle-orm/libsql');
-  const libsql = createClient({ url, authToken: authToken || undefined });
-  return { client: libsql, db: drizzle(libsql, { schema }) };
+  const isDev = import.meta.env?.DEV ?? process.env.NODE_ENV !== 'production';
+  if (isDev) {
+    const { createLocalLibsqlClient } = await import('./local-client');
+    return createLocalLibsqlClient(url, authToken);
+  }
+
+  throw new Error('Local SQLite is only available in development.');
 }
 
 export async function createDbConnection(url: string, authToken?: string): Promise<AppDatabase> {
-  const { db } = await createLibsqlClient(url, authToken);
-  return db;
+  const connection = await createConnection(url, authToken);
+  return connection.db;
 }
 
 let initPromise: Promise<AppDatabase> | null = null;
@@ -36,9 +64,8 @@ export async function getDbReady(): Promise<AppDatabase> {
   if (!dbInstance) {
     if (!initPromise) {
       initPromise = (async () => {
-        const url = process.env.TURSO_DATABASE_URL ?? 'file:./data/bingo-facil.sqlite';
-        const authToken = process.env.TURSO_AUTH_TOKEN;
-        const connection = await createLibsqlClient(url, authToken);
+        const { url, authToken } = resolveDatabaseConfig();
+        const connection = await createConnection(url, authToken);
         client = connection.client;
         await migrateClient(client);
         dbInstance = connection.db;
@@ -55,85 +82,6 @@ export function getDb(): AppDatabase {
     throw new Error('Database not ready. Call getDbReady() first.');
   }
   return dbInstance;
-}
-
-const MIGRATION_STATEMENTS = [
-  `CREATE TABLE IF NOT EXISTS user (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      email_verified INTEGER NOT NULL DEFAULT 0,
-      image TEXT,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL
-    )`,
-  `CREATE TABLE IF NOT EXISTS session (
-      id TEXT PRIMARY KEY,
-      expires_at INTEGER NOT NULL,
-      token TEXT NOT NULL UNIQUE,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      ip_address TEXT,
-      user_agent TEXT,
-      user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE
-    )`,
-  `CREATE TABLE IF NOT EXISTS account (
-      id TEXT PRIMARY KEY,
-      account_id TEXT NOT NULL,
-      provider_id TEXT NOT NULL,
-      user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-      access_token TEXT,
-      refresh_token TEXT,
-      id_token TEXT,
-      access_token_expires_at INTEGER,
-      refresh_token_expires_at INTEGER,
-      scope TEXT,
-      password TEXT,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL
-    )`,
-  `CREATE TABLE IF NOT EXISTS verification (
-      id TEXT PRIMARY KEY,
-      identifier TEXT NOT NULL,
-      value TEXT NOT NULL,
-      expires_at INTEGER NOT NULL,
-      created_at INTEGER,
-      updated_at INTEGER
-    )`,
-  `CREATE TABLE IF NOT EXISTS events (
-      id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      name TEXT NOT NULL,
-      event_date TEXT NOT NULL,
-      bingo_type TEXT NOT NULL DEFAULT '75',
-      total_cards INTEGER NOT NULL,
-      footer_text TEXT,
-      status TEXT NOT NULL DEFAULT 'active',
-      drawn_numbers TEXT NOT NULL DEFAULT '[]',
-      created_at INTEGER NOT NULL DEFAULT (unixepoch()),
-      updated_at INTEGER
-    )`,
-  `CREATE TABLE IF NOT EXISTS cards (
-      id TEXT PRIMARY KEY,
-      event_id TEXT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-      user_id TEXT NOT NULL,
-      card_number TEXT NOT NULL,
-      numbers TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'available',
-      buyer_name TEXT,
-      buyer_phone TEXT,
-      created_at INTEGER NOT NULL DEFAULT (unixepoch()),
-      updated_at INTEGER
-    )`,
-  `CREATE INDEX IF NOT EXISTS idx_events_user_created ON events(user_id, created_at)`,
-  `CREATE INDEX IF NOT EXISTS idx_cards_event_number ON cards(event_id, card_number)`,
-  `CREATE INDEX IF NOT EXISTS idx_cards_user_status ON cards(user_id, status, updated_at)`,
-];
-
-export async function migrateClient(libsql: Client): Promise<void> {
-  for (const sql of MIGRATION_STATEMENTS) {
-    await libsql.execute(sql);
-  }
 }
 
 export async function migrateDb(database: AppDatabase, libsqlClient?: Client): Promise<void> {
@@ -156,3 +104,5 @@ export function closeDb(): void {
 export function resetDbForTests(): void {
   closeDb();
 }
+
+export { migrateClient } from './migrate';

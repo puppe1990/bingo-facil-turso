@@ -3,8 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createClient, type Client } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
+import { migrateClient } from '../lib/db/migrate';
 import * as schema from '../lib/db/schema';
-import { migrateClient } from '../lib/db/index';
 
 export async function createTestDb() {
   const dbPath = join(tmpdir(), `bingo-test-${crypto.randomUUID()}.sqlite`);

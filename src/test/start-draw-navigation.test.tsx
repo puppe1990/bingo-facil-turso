@@ -59,6 +59,10 @@ vi.mock('../server/events.functions', () => ({
   listSoldCardsFn: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock('../server/subscriptions.functions', () => ({
+  getUserSubscriptionFn: vi.fn().mockResolvedValue(null),
+}));
+
 Object.defineProperty(window, 'speechSynthesis', {
   writable: true,
   value: { speak: vi.fn(), cancel: vi.fn() },

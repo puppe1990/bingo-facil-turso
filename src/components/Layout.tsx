@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { signOut, useSession } from '../lib/auth-client';
 import { BrandMark } from './BrandMark';
+import { getUserSubscriptionFn } from '../server/subscriptions.functions';
+import { formatPlanLabel } from '../lib/ui/subscription-badges';
 import { LogOut, LayoutDashboard, PlusCircle, Ticket, Users, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -10,6 +13,15 @@ export function Layout({ children }: { children?: ReactNode }) {
   const location = useRouterState({ select: (s) => s.location });
   const { data: session } = useSession();
   const user = session?.user;
+  const [planLabel, setPlanLabel] = useState('Sem assinatura');
+
+  useEffect(() => {
+    getUserSubscriptionFn()
+      .then((sub) => {
+        setPlanLabel(sub ? formatPlanLabel(sub.plan) : 'Sem assinatura');
+      })
+      .catch(() => setPlanLabel('Sem assinatura'));
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -96,7 +108,7 @@ export function Layout({ children }: { children?: ReactNode }) {
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-bold truncate leading-none">{user?.name}</p>
-              <p className="text-[10px] text-indigo-300 truncate mt-1">PRO • Ilimitado</p>
+              <p className="text-[10px] text-indigo-300 truncate mt-1">{planLabel}</p>
             </div>
           </div>
           <button
