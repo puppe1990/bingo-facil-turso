@@ -50,7 +50,7 @@ describe('Settings subscription display', () => {
       plan: 'pro',
       status: 'active',
       effectiveStatus: 'active',
-      expiresAt: new Date('2026-08-15'),
+      expiresAt: new Date(2026, 7, 15),
     });
 
     const user = userEvent.setup();
@@ -60,6 +60,6 @@ describe('Settings subscription display', () => {
 
     expect(await screen.findByText('Pro')).toBeInTheDocument();
     expect(screen.getByText('Ativa')).toBeInTheDocument();
-    expect(screen.getByText(/14\/08\/2026/)).toBeInTheDocument();
+    expect(screen.getByText('15/08/2026')).toBeInTheDocument();
   });
 });
