@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import type { Client } from '@libsql/client';
 import { createTestDb, destroyTestDb } from '../test/db';
 import type { AppDatabase } from '../lib/db/index';
-import { cards, events } from '../lib/db/schema';
+import { cards, events, user } from '../lib/db/schema';
 import {
   createEventWithCards,
   listEvents,
@@ -30,6 +30,32 @@ describe('events.server', () => {
     db = testDb.db;
     client = testDb.client;
     dbPath = testDb.dbPath;
+
+    const now = new Date();
+    await db.insert(user).values([
+      {
+        id: userA,
+        name: 'User A',
+        email: 'a@test.com',
+        emailVerified: true,
+        role: 'user',
+        isActive: true,
+        accessExpiresAt: new Date('2027-01-01'),
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: userB,
+        name: 'User B',
+        email: 'b@test.com',
+        emailVerified: true,
+        role: 'user',
+        isActive: true,
+        accessExpiresAt: new Date('2027-01-01'),
+        createdAt: now,
+        updatedAt: now,
+      },
+    ]);
   });
 
   afterEach(() => {
