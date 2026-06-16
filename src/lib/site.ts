@@ -3,6 +3,7 @@ const DEFAULT_SITE_URL = 'http://localhost:3001';
 export const siteConfig = {
   name: 'Bingo Fácil',
   shortName: 'Bingo Fácil',
+  title: 'Bingo Fácil — Gerencie eventos, cartelas e sorteios ao vivo',
   description:
     'Crie, gerencie e realize sorteios profissionais com conferência automática de cartelas.',
   locale: 'pt_BR',
