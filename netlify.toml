@@ -7,5 +7,4 @@
 
 [functions]
   node_bundler = "esbuild"
-  included_files = ["dist/server/**", "node_modules/drizzle-orm/**", "node_modules/@libsql/client/**"]
-  external_node_modules = ["drizzle-orm", "@libsql/client"]
+  included_files = ["dist/server/**"]

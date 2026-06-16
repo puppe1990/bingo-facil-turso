@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Settings as SettingsIcon,
   User,
@@ -7,10 +7,16 @@ import {
   CreditCard,
   ExternalLink,
 } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { useSession } from '../lib/auth-client';
 import { ChangePasswordForm } from '../features/settings/change-password-form';
+import { getUserSubscriptionFn } from '../server/subscriptions.functions';
+import { formatPlanLabel, formatStatusLabel } from '../lib/ui/subscription-badges';
 
 type SettingsTab = 'perfil' | 'seguranca' | 'notificacoes' | 'assinatura';
+
+type UserSubscription = Awaited<ReturnType<typeof getUserSubscriptionFn>>;
 
 const NAV_ITEMS: { id: SettingsTab; icon: typeof User; label: string }[] = [
   { id: 'perfil', icon: User, label: 'Perfil' },
@@ -21,9 +27,19 @@ const NAV_ITEMS: { id: SettingsTab; icon: typeof User; label: string }[] = [
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('perfil');
+  const [subscription, setSubscription] = useState<UserSubscription>(null);
   const { data: session } = useSession();
   const user = session?.user;
   const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? 'U';
+
+  useEffect(() => {
+    getUserSubscriptionFn()
+      .then(setSubscription)
+      .catch(() => setSubscription(null));
+  }, []);
+
+  const planLabel = subscription ? formatPlanLabel(subscription.plan) : 'Sem assinatura';
+  const statusLabel = subscription ? formatStatusLabel(subscription.effectiveStatus) : 'Inativa';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl">
@@ -77,7 +93,7 @@ export function Settings() {
                       </p>
                       <p className="text-indigo-400 font-medium text-sm">{user?.email}</p>
                       <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                        Conta Pro Platinium
+                        Conta {planLabel}
                       </span>
                     </div>
                   </div>
@@ -95,30 +111,26 @@ export function Settings() {
                       />
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="pt-4 flex gap-4">
-                    <button className="bg-indigo-900 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-indigo-800 transition-all shadow-lg shadow-indigo-900/10">
-                      Salvar Alterações
+              {subscription?.effectiveStatus === 'active' && (
+                <div className="bg-amber-50 p-8 rounded-[2.5rem] border-2 border-amber-100 relative overflow-hidden">
+                  <div className="absolute top-[-20%] right-[-10%] w-40 h-40 bg-amber-200/20 rounded-full blur-3xl" />
+                  <div className="relative z-10">
+                    <h3 className="text-lg font-black text-amber-900 flex items-center gap-2 mb-2">
+                      Suporte Premium Ativo
+                    </h3>
+                    <p className="text-amber-800/70 font-medium text-sm leading-relaxed mb-6">
+                      Como usuário {planLabel}, você tem acesso prioritário ao nosso time de
+                      suporte.
+                    </p>
+                    <button className="flex items-center gap-2 text-amber-900 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
+                      Acessar Central de Ajuda <ExternalLink className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-amber-50 p-8 rounded-[2.5rem] border-2 border-amber-100 relative overflow-hidden">
-                <div className="absolute top-[-20%] right-[-10%] w-40 h-40 bg-amber-200/20 rounded-full blur-3xl" />
-                <div className="relative z-10">
-                  <h3 className="text-lg font-black text-amber-900 flex items-center gap-2 mb-2">
-                    Suporte Premium Ativo
-                  </h3>
-                  <p className="text-amber-800/70 font-medium text-sm leading-relaxed mb-6">
-                    Como usuário Pro, você tem acesso prioritário ao nosso time de suporte via
-                    WhatsApp e E-mail.
-                  </p>
-                  <button className="flex items-center gap-2 text-amber-900 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
-                    Acessar Central de Ajuda <ExternalLink className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+              )}
             </>
           )}
 
@@ -131,6 +143,43 @@ export function Settings() {
                 Atualize sua senha para manter sua conta protegida.
               </p>
               <ChangePasswordForm />
+            </div>
+          )}
+
+          {activeTab === 'assinatura' && (
+            <div className="bg-white p-8 rounded-[2.5rem] border-2 border-indigo-50 shadow-sm space-y-6">
+              <h2 className="text-xl font-black text-indigo-900 uppercase italic">
+                Sua Assinatura
+              </h2>
+
+              {subscription ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                    <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                      Plano
+                    </span>
+                    <span className="font-black text-indigo-900">{planLabel}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                    <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                      Status
+                    </span>
+                    <span className="font-black text-indigo-900">{statusLabel}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-2xl">
+                    <span className="font-bold text-indigo-400 uppercase text-[10px] tracking-widest">
+                      Expira em
+                    </span>
+                    <span className="font-black text-indigo-900">
+                      {format(subscription.expiresAt, 'dd/MM/yyyy', { locale: ptBR })}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-indigo-400 font-bold">
+                  Você ainda não possui uma assinatura ativa.
+                </p>
+              )}
             </div>
           )}
         </div>

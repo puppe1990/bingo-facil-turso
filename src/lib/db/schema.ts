@@ -1,6 +1,6 @@
 import { relations, sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import type { BingoCard } from '../bingo';
+import type { BingoCard } from './types';
 
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
@@ -8,6 +8,7 @@ export const user = sqliteTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
   image: text('image'),
+  role: text('role').notNull().default('user'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
@@ -52,6 +53,21 @@ export const verification = sqliteTable('verification', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }),
 });
 
+export const subscriptions = sqliteTable('subscriptions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  plan: text('plan').notNull().default('free'),
+  status: text('status').notNull().default('active'),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+  notes: text('notes'),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+});
+
 export const events = sqliteTable('events', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),
@@ -93,7 +109,13 @@ export const cardsRelations = relations(cards, ({ one }) => ({
   event: one(events, { fields: [cards.eventId], references: [events.id] }),
 }));
 
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(user, { fields: [subscriptions.userId], references: [user.id] }),
+}));
+
 export type Event = typeof events.$inferSelect;
 export type Card = typeof cards.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertEvent = typeof events.$inferInsert;
 export type InsertCard = typeof cards.$inferInsert;
+export type InsertSubscription = typeof subscriptions.$inferInsert;

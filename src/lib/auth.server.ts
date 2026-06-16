@@ -42,6 +42,16 @@ export async function getAuth() {
         enabled: true,
         autoSignIn: true,
       },
+      user: {
+        additionalFields: {
+          role: {
+            type: 'string',
+            required: false,
+            defaultValue: 'user',
+            input: false,
+          },
+        },
+      },
       trustedOrigins: getTrustedOrigins(baseURL),
       ...(process.env.NODE_ENV !== 'production' && {
         advanced: { disableOriginCheck: true },

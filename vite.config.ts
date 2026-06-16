@@ -1,3 +1,4 @@
+import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import netlify from '@netlify/vite-plugin-tanstack-start';
@@ -14,9 +15,11 @@ export default defineConfig({
   },
   resolve: {
     conditions: ['netlify', 'import', 'module', 'browser', 'default'],
-  },
-  ssr: {
-    external: ['libsql', '@libsql/linux-x64-gnu'],
+    alias: {
+      clsx: path.resolve(__dirname, 'node_modules/clsx'),
+      'tailwind-merge': path.resolve(__dirname, 'node_modules/tailwind-merge'),
+      'drizzle-orm': path.resolve(__dirname, 'node_modules/drizzle-orm'),
+    },
   },
   plugins: [
     tsConfigPaths(),
