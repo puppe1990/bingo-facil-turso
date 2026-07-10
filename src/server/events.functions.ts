@@ -27,19 +27,47 @@ export const getEventFn = createServerFn({ method: 'GET' })
     return eventsServer.getEvent(getDb(), data.eventId, userId);
   });
 
-const createEventSchema = z.object({
-  name: z.string().min(1),
-  eventDate: z.string(),
-  totalCards: z.number().min(1).max(10000),
-  bingoType: z.string().optional(),
-  footerText: z.string().optional(),
-});
+const createEventSchema = z.discriminatedUnion('cardSource', [
+  z.object({
+    cardSource: z.literal('generate'),
+    name: z.string().min(1),
+    eventDate: z.string(),
+    totalCards: z.number().min(1).max(10000),
+    bingoType: z.string().optional(),
+    footerText: z.string().optional(),
+  }),
+  z.object({
+    cardSource: z.literal('import'),
+    name: z.string().min(1),
+    eventDate: z.string(),
+    importedCardsText: z.string().min(1),
+    bingoType: z.string().optional(),
+    footerText: z.string().optional(),
+  }),
+]);
 
 export const createEventFn = createServerFn({ method: 'POST' })
   .validator(createEventSchema)
   .handler(async ({ data }) => {
     const userId = await requireUserId();
-    return eventsServer.createEventWithCards(getDb(), userId, data);
+
+    if (data.cardSource === 'import') {
+      return eventsServer.createEventWithImportedCards(getDb(), userId, {
+        name: data.name,
+        eventDate: data.eventDate,
+        importedCardsText: data.importedCardsText,
+        bingoType: data.bingoType,
+        footerText: data.footerText,
+      });
+    }
+
+    return eventsServer.createEventWithCards(getDb(), userId, {
+      name: data.name,
+      eventDate: data.eventDate,
+      totalCards: data.totalCards,
+      bingoType: data.bingoType,
+      footerText: data.footerText,
+    });
   });
 
 export const deleteEventFn = createServerFn({ method: 'POST' })

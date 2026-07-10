@@ -1,5 +1,6 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { generateUniqueCards } from '../lib/bingo';
+import { parseImportedCardsText } from '../lib/import-cards';
 import type { AppDatabase } from '../lib/db/index';
 import { cards, events } from '../lib/db/schema';
 import { assertUserCanAccess } from './user-access.server';
@@ -22,6 +23,13 @@ export class DrawLimitError extends Error {
   constructor(message = 'All numbers have been drawn') {
     super(message);
     this.name = 'DrawLimitError';
+  }
+}
+
+export class InvalidImportError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidImportError';
   }
 }
 
@@ -81,6 +89,60 @@ export async function createEventWithCards(
       userId,
       cardNumber: String(index + 1).padStart(6, '0'),
       numbers,
+      status: 'available' as const,
+      createdAt: now,
+    }));
+
+    const batchSize = 100;
+    for (let i = 0; i < cardRows.length; i += batchSize) {
+      await tx.insert(cards).values(cardRows.slice(i, i + batchSize));
+    }
+  });
+
+  return eventId;
+}
+
+export async function createEventWithImportedCards(
+  db: AppDatabase,
+  userId: string,
+  input: {
+    name: string;
+    eventDate: string;
+    importedCardsText: string;
+    bingoType?: string;
+    footerText?: string;
+  },
+) {
+  await assertUserCanAccess(db, userId);
+
+  const parsed = parseImportedCardsText(input.importedCardsText);
+  if (!parsed.ok) {
+    throw new InvalidImportError(parsed.error);
+  }
+
+  const eventId = crypto.randomUUID();
+  const now = new Date();
+
+  await db.transaction(async (tx) => {
+    await tx.insert(events).values({
+      id: eventId,
+      userId,
+      name: input.name,
+      eventDate: input.eventDate,
+      bingoType: input.bingoType ?? '75',
+      totalCards: parsed.cards.length,
+      footerText: input.footerText ?? '',
+      status: 'active',
+      drawnNumbers: [],
+      createdAt: now,
+    });
+
+    const cardRows = parsed.cards.map((importedCard) => ({
+      id: crypto.randomUUID(),
+      eventId,
+      userId,
+      cardNumber: importedCard.cardNumber.padStart(6, '0'),
+      numbers: importedCard.numbers,
       status: 'available' as const,
       createdAt: now,
     }));

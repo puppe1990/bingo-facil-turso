@@ -6,6 +6,7 @@ import type { AppDatabase } from '../lib/db/index';
 import { cards, events, user } from '../lib/db/schema';
 import {
   createEventWithCards,
+  createEventWithImportedCards,
   listEvents,
   sellCard,
   deleteEvent,
@@ -16,7 +17,9 @@ import {
   getEvent,
   DrawLimitError,
   NotFoundError,
+  InvalidImportError,
 } from './events.server';
+import { checkWinner } from '../lib/bingo';
 
 describe('events.server', () => {
   let db: AppDatabase;
@@ -191,6 +194,56 @@ describe('events.server', () => {
     });
 
     await expect(getEvent(db, eventId, userB)).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it('createEventWithImportedCards stores pre-made cards with custom numbers', async () => {
+    const importedText = `
+001 1 5 8 12 14 16 22 25 28 30 31 35 38 42 46 50 55 58 60 61 68 70 72 75
+002 2 6 9 13 15 17 23 26 29 30 32 36 39 43 47 51 56 59 60 62 69 71 73 74
+    `;
+
+    const eventId = await createEventWithImportedCards(db, userA, {
+      name: 'Bingo com cartelas prontas',
+      eventDate: '2026-07-10',
+      importedCardsText: importedText,
+    });
+
+    const event = await getEvent(db, eventId, userA);
+    expect(event.totalCards).toBe(2);
+
+    const eventCards = await listCards(db, eventId, userA);
+    expect(eventCards.map((card) => card.cardNumber).sort()).toEqual(['000001', '000002']);
+    expect(eventCards[0].numbers.N[2]).toBe('FREE');
+  });
+
+  it('createEventWithImportedCards rejects invalid import text', async () => {
+    await expect(
+      createEventWithImportedCards(db, userA, {
+        name: 'Import inválido',
+        eventDate: '2026-07-10',
+        importedCardsText: '001 1 2 3',
+      }),
+    ).rejects.toBeInstanceOf(InvalidImportError);
+  });
+
+  it('imported cards are checked together during live draw', async () => {
+    const importedText = '001 1 2 3 4 5 16 17 18 19 20 31 32 34 35 46 47 48 49 50 61 62 63 64 65';
+
+    const eventId = await createEventWithImportedCards(db, userA, {
+      name: 'Conferência',
+      eventDate: '2026-07-10',
+      importedCardsText: importedText,
+    });
+
+    const allNumbers = [
+      1, 2, 3, 4, 5, 16, 17, 18, 19, 20, 31, 32, 34, 35, 46, 47, 48, 49, 50, 61, 62, 63, 64, 65,
+    ];
+    await db.update(events).set({ drawnNumbers: allNumbers }).where(eq(events.id, eventId));
+
+    const eventCards = await listCards(db, eventId, userA);
+    const winners = eventCards.filter((card) => checkWinner(card.numbers, allNumbers, 'full'));
+    expect(winners).toHaveLength(1);
+    expect(winners[0].cardNumber).toBe('000001');
   });
 
   it('resetDraw clears drawn numbers', async () => {
