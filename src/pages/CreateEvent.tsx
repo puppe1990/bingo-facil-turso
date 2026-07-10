@@ -1,12 +1,17 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Calendar, Ticket, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { Calendar, Ticket, ArrowLeft, Loader2, Sparkles, Upload, Wand2 } from 'lucide-react';
+import { ImportCardsPanel } from '../components/ImportCardsPanel';
 import { createEventFn } from '../server/events.functions';
+
+type CardSource = 'generate' | 'import';
 
 export function CreateEvent() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [cardSource, setCardSource] = useState<CardSource>('generate');
+  const [importedCardsText, setImportedCardsText] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     eventDate: new Date().toISOString().split('T')[0],
@@ -20,12 +25,41 @@ export function CreateEvent() {
     setLoading(true);
     setError('');
 
+    if (cardSource === 'import' && !importedCardsText.trim()) {
+      setError('Cadastre ou importe ao menos uma cartela válida.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const eventId = await createEventFn({ data: formData });
+      const payload =
+        cardSource === 'import'
+          ? {
+              cardSource: 'import' as const,
+              name: formData.name,
+              eventDate: formData.eventDate,
+              bingoType: formData.bingoType,
+              footerText: formData.footerText,
+              importedCardsText,
+            }
+          : {
+              cardSource: 'generate' as const,
+              name: formData.name,
+              eventDate: formData.eventDate,
+              totalCards: formData.totalCards,
+              bingoType: formData.bingoType,
+              footerText: formData.footerText,
+            };
+
+      const eventId = await createEventFn({ data: payload });
       navigate({ to: '/event/$eventId', params: { eventId } });
     } catch (err) {
       console.error('Failed to create event', err);
-      setError('Não foi possível criar o evento. Verifique os dados e tente novamente.');
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : 'Não foi possível criar o evento. Verifique os dados e tente novamente.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -50,7 +84,7 @@ export function CreateEvent() {
             </div>
             <h1 className="text-4xl font-black uppercase tracking-tight">Configuração de Bingo</h1>
             <p className="text-indigo-300 font-medium mt-2">
-              Personalize as regras e gere cartelas únicas instantaneamente.
+              Gere cartelas novas ou importe as que você já tem prontas para conferência no sorteio.
             </p>
           </div>
         </div>
@@ -61,6 +95,54 @@ export function CreateEvent() {
               {error}
             </div>
           )}
+
+          <div className="space-y-4">
+            <label className="block text-xs font-black text-indigo-300 uppercase tracking-widest">
+              Origem das Cartelas
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setCardSource('generate')}
+                className={`p-5 rounded-2xl border-2 text-left transition-all ${
+                  cardSource === 'generate'
+                    ? 'border-emerald-400 bg-emerald-50'
+                    : 'border-indigo-100 bg-indigo-50 hover:border-indigo-200'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Wand2 className="w-5 h-5 text-emerald-600" />
+                  <span className="font-black text-indigo-900 uppercase text-sm tracking-wide">
+                    Gerar automaticamente
+                  </span>
+                </div>
+                <p className="text-xs text-indigo-400 font-medium">
+                  O sistema cria cartelas únicas para você imprimir e vender.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCardSource('import')}
+                className={`p-5 rounded-2xl border-2 text-left transition-all ${
+                  cardSource === 'import'
+                    ? 'border-amber-400 bg-amber-50'
+                    : 'border-indigo-100 bg-indigo-50 hover:border-indigo-200'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Upload className="w-5 h-5 text-amber-600" />
+                  <span className="font-black text-indigo-900 uppercase text-sm tracking-wide">
+                    Importar cartelas prontas
+                  </span>
+                </div>
+                <p className="text-xs text-indigo-400 font-medium">
+                  Cole texto, envie CSV ou cadastre cartela a cartela no formulário visual.
+                </p>
+              </button>
+            </div>
+          </div>
+
           <div className="space-y-8">
             <div className="group">
               <label className="block text-xs font-black text-indigo-300 uppercase tracking-widest mb-3">
@@ -92,31 +174,49 @@ export function CreateEvent() {
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-black text-indigo-300 uppercase tracking-widest mb-3">
-                  Qtd. de Cartelas
-                </label>
-                <div className="relative group">
-                  <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-300 group-focus-within:text-indigo-600 transition-colors" />
-                  <input
-                    type="number"
-                    min="1"
-                    max="1000"
-                    required
-                    className="w-full pl-12 pr-6 py-4 bg-indigo-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-2xl font-bold text-indigo-900 outline-none transition-all shadow-inner"
-                    value={formData.totalCards}
-                    onChange={(e) =>
-                      setFormData({ ...formData, totalCards: parseInt(e.target.value) })
-                    }
-                  />
+
+              {cardSource === 'generate' ? (
+                <div>
+                  <label className="block text-xs font-black text-indigo-300 uppercase tracking-widest mb-3">
+                    Qtd. de Cartelas
+                  </label>
+                  <div className="relative group">
+                    <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-300 group-focus-within:text-indigo-600 transition-colors" />
+                    <input
+                      type="number"
+                      min="1"
+                      max="1000"
+                      required
+                      className="w-full pl-12 pr-6 py-4 bg-indigo-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-2xl font-bold text-indigo-900 outline-none transition-all shadow-inner"
+                      value={formData.totalCards}
+                      onChange={(e) =>
+                        setFormData({ ...formData, totalCards: parseInt(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div className="flex justify-between items-center mt-2 px-1">
+                    <p className="text-[10px] text-indigo-300 font-bold uppercase tracking-widest">
+                      Capacidade MVP: 1000
+                    </p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center mt-2 px-1">
-                  <p className="text-[10px] text-indigo-300 font-bold uppercase tracking-widest">
-                    Capacidade MVP: 1000
+              ) : (
+                <div className="flex items-end">
+                  <p className="text-sm text-indigo-400 font-medium pb-4">
+                    A quantidade depende das cartelas importadas ou cadastradas.
                   </p>
                 </div>
-              </div>
+              )}
             </div>
+
+            {cardSource === 'import' && (
+              <div>
+                <label className="block text-xs font-black text-indigo-300 uppercase tracking-widest mb-3">
+                  Cartelas para importar
+                </label>
+                <ImportCardsPanel onChange={setImportedCardsText} />
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-black text-indigo-300 uppercase tracking-widest mb-3">
@@ -141,17 +241,27 @@ export function CreateEvent() {
               {loading ? (
                 <>
                   <Loader2 className="w-8 h-8 animate-spin" />
-                  Gerando Cartelas Únicas...
+                  {cardSource === 'import'
+                    ? 'Importando Cartelas...'
+                    : 'Gerando Cartelas Únicas...'}
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-6 h-6 fill-current text-white/50" />
-                  Gerar e Finalizar Evento
+                  {cardSource === 'import' ? (
+                    <Upload className="w-6 h-6" />
+                  ) : (
+                    <Sparkles className="w-6 h-6 fill-current text-white/50" />
+                  )}
+                  {cardSource === 'import'
+                    ? 'Importar e Iniciar Evento'
+                    : 'Gerar e Finalizar Evento'}
                 </>
               )}
             </button>
             <p className="text-center text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] mt-4">
-              Ao criar, garantimos que nenhuma cartela seja repetida.
+              {cardSource === 'import'
+                ? 'No sorteio ao vivo, todas as cartelas importadas serão conferidas automaticamente.'
+                : 'Ao criar, garantimos que nenhuma cartela seja repetida.'}
             </p>
           </div>
         </form>
