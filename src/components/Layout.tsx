@@ -6,7 +6,6 @@ import { BrandMark } from './BrandMark';
 import { getUserAccessForSessionFn } from '../server/user-access.functions';
 import type { UserAccessSessionView } from '../server/user-access.server';
 import { LogOut, LayoutDashboard, PlusCircle, Ticket, Users, Settings } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 
 export function Layout({ children }: { children?: ReactNode }) {
   const navigate = useNavigate();
@@ -160,19 +159,7 @@ export function Layout({ children }: { children?: ReactNode }) {
       </nav>
 
       <main className="flex-1 md:ml-64 min-h-screen">
-        <div className="max-w-7xl mx-auto p-4 md:p-10">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            >
-              {children ?? <Outlet />}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <div className="max-w-7xl mx-auto p-4 md:p-10">{children ?? <Outlet />}</div>
       </main>
     </div>
   );
