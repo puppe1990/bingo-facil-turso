@@ -42,4 +42,22 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument();
     expect(screen.getByText('Criar conta')).toBeInTheDocument();
   });
+
+  it('does not keep the login card mounted when a session already exists', () => {
+    vi.mocked(useSession).mockReturnValue({
+      data: {
+        user: { id: '1', name: 'Matheus', email: 'matheus.puppe@gmail.com' },
+        session: { id: 's1' },
+      },
+      isPending: false,
+      isRefetching: false,
+      error: null,
+      refetch: () => {},
+    } as ReturnType<typeof useSession>);
+
+    render(<LoginPage />);
+
+    expect(screen.queryByText('Bem-vindo ao Jogo')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /entrar/i })).not.toBeInTheDocument();
+  });
 });

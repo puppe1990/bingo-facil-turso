@@ -15,9 +15,13 @@ export function SignupPage() {
 
   useEffect(() => {
     if (session) {
-      navigate({ to: '/' });
+      navigate({ to: '/', replace: true });
     }
   }, [session, navigate]);
+
+  if (session) {
+    return null;
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,13 +41,15 @@ export function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-yellow-50 relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60 animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-50 rounded-full blur-[120px] opacity-60" />
+    <div className="min-h-dvh flex items-center justify-center p-6 py-10 bg-yellow-50 relative">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-50 rounded-full blur-[120px] opacity-60" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-50 rounded-full blur-[120px] opacity-60" />
+      </div>
 
       <div className="max-w-md w-full relative z-10">
         <div className="bg-white rounded-[3.5rem] shadow-[0_32px_80px_rgba(30,27,75,0.08)] border-2 border-indigo-50 overflow-hidden">
-          <div className="bg-indigo-900 p-12 text-center relative">
+          <div className="bg-indigo-900 p-8 md:p-12 text-center relative">
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-20 h-20 bg-amber-400 rounded-3xl flex items-center justify-center shadow-2xl mb-6">
                 <Ticket className="w-10 h-10 text-indigo-900" />
@@ -57,7 +63,7 @@ export function SignupPage() {
             </div>
           </div>
 
-          <div className="p-12">
+          <div className="p-8 md:p-12">
             {error && (
               <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border-2 border-red-100">
                 {error}

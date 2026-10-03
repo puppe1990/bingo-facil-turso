@@ -31,7 +31,7 @@ export function Layout({ children }: { children?: ReactNode }) {
 
   const handleLogout = async () => {
     await signOut();
-    navigate({ to: '/login' });
+    navigate({ to: '/login', replace: true });
   };
 
   const isActive = (path: string) => location.pathname === path;
