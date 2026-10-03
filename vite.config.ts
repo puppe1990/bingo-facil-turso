@@ -1,7 +1,7 @@
 import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import netlify from '@netlify/vite-plugin-tanstack-start';
+import { nitro } from 'nitro/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import tsConfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vite';
@@ -21,6 +21,9 @@ export default defineConfig({
       'drizzle-orm': path.resolve(__dirname, 'node_modules/drizzle-orm'),
     },
   },
+  ssr: {
+    external: ['libsql', '@libsql/linux-x64-gnu'],
+  },
   plugins: [
     tsConfigPaths(),
     tanstackStart({
@@ -30,7 +33,7 @@ export default defineConfig({
         routeFileIgnorePattern: '\\.test\\.',
       },
     }),
-    netlify(),
+    nitro(),
     react(),
     tailwindcss(),
     warmupServerFnsPlugin(),
