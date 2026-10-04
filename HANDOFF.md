@@ -143,19 +143,18 @@ data/                       # SQLite local
 
 ### O que não funciona / está pendente
 
-| Item                             | Prioridade | Detalhe                                                                                                                                                      |
-| -------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm start`                      | Alta       | Aponta para `.output/server/index.mjs`; build gera `dist/server/server.js`                                                                                   |
-| Browser E2E                      | Média      | Timeout após "Gerar e Finalizar Evento" — provável issue com `fill()` em input controlado React (default 100 cartelas) ou erro silencioso no `createEventFn` |
-| Erros silenciosos na UI          | Média      | `CreateEvent.tsx` faz `catch` sem feedback visual                                                                                                            |
-| Script de migração Firestore     | Média      | Não existe — dados antigos do Firebase não são importados                                                                                                    |
-| README desatualizado             | Baixa      | Ainda referencia AI Studio / `GEMINI_API_KEY`                                                                                                                |
-| Deps não usadas                  | Baixa      | `@google-cloud/storage`, `@google/genai`, `express`                                                                                                          |
-| `firestore.rules`                | Baixa      | Artefato legado no root                                                                                                                                      |
-| Dual migration strategy          | Baixa      | Inline SQL em `index.ts` vs `drizzle-kit push` — sem pasta `migrations/`                                                                                     |
-| Realtime multi-device            | Baixa      | Live draw usa polling, não websockets                                                                                                                        |
-| Settings stubs                   | Baixa      | Security, Notifications, Subscription são UI-only                                                                                                            |
-| Limite de cartelas inconsistente | Baixa      | Form `max="1000"`, Zod permite até `10000`                                                                                                                   |
+| Item                         | Prioridade | Detalhe                                                                                                                                                      |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm start`                  | Alta       | Aponta para `.output/server/index.mjs`; build gera `dist/server/server.js`                                                                                   |
+| Browser E2E                  | Média      | Timeout após "Gerar e Finalizar Evento" — provável issue com `fill()` em input controlado React (default 100 cartelas) ou erro silencioso no `createEventFn` |
+| Erros silenciosos na UI      | Média      | `CreateEvent.tsx` faz `catch` sem feedback visual                                                                                                            |
+| Script de migração Firestore | Média      | Não existe — dados antigos do Firebase não são importados                                                                                                    |
+| README desatualizado         | Baixa      | Ainda referencia AI Studio / `GEMINI_API_KEY`                                                                                                                |
+| Deps não usadas              | Baixa      | `@google-cloud/storage`, `@google/genai`, `express`                                                                                                          |
+| `firestore.rules`            | Baixa      | Artefato legado no root                                                                                                                                      |
+| Dual migration strategy      | Baixa      | Inline SQL em `index.ts` vs `drizzle-kit push` — sem pasta `migrations/`                                                                                     |
+| Realtime multi-device        | Baixa      | Live draw usa polling, não websockets                                                                                                                        |
+| Settings stubs               | Baixa      | Security, Notifications, Subscription são UI-only                                                                                                            |
 
 ---
 

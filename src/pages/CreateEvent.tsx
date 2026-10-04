@@ -185,7 +185,7 @@ export function CreateEvent() {
                     <input
                       type="number"
                       min="1"
-                      max="1000"
+                      max="10000"
                       required
                       className="w-full pl-12 pr-6 py-4 bg-indigo-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-2xl font-bold text-indigo-900 outline-none transition-all shadow-inner"
                       value={formData.totalCards}
@@ -196,7 +196,7 @@ export function CreateEvent() {
                   </div>
                   <div className="flex justify-between items-center mt-2 px-1">
                     <p className="text-[10px] text-indigo-300 font-bold uppercase tracking-widest">
-                      Capacidade MVP: 1000
+                      Capacidade: 10.000
                     </p>
                   </div>
                 </div>
